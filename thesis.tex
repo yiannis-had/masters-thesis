@@ -97,7 +97,7 @@
 
     \vspace{2cm}
 
-    \includegraphics[width=0.3\textwidth]{gu-logo}
+    \includegraphics[width=0.3\textwidth]{img/gu-logo}
 
     {\normalsize
         Department of Philosophy, Linguistics, and Theory of Science \par
@@ -121,19 +121,19 @@
 
 \chapter*{Abstract}
 
-This thesis provides a systematic exposition of the semiring-based framework for database provenance. Starting from the foundational results for the positive relational algebra, we examine the use of commutative semirings and the role of polynomials as a universal representation of provenance.
+This thesis provides an accessible exposition of the semiring-based framework for database provenance. Starting from the foundational results for the positive relational algebra, we examine the use of commutative semirings and the role of polynomials as a universal representation of provenance.
 
 A central theme of this work is the extension of the framework to more expressive queries, specifically addressing the challenges posed by aggregation and difference. The study reviews existing literature, providing rigorous proofs for established results and reformulating key concepts where further clarity is needed.
 
 \chapter*{Acknowledgements}
 
-I would like to express my sincere appreciation to Ivan Di Liberti for giving me the opportunity to pursue the topics I find most interesting and for his continuous support throughout this project. I am especially grateful that he connected me with Phokion Kolaitis, which led to the joint supervision of my master's thesis. I also wish to thank Phokion Kolaitis for agreeing to supervise my thesis despite his busy schedule, and for the attention and guidance he has generously provided. I am further grateful to the University of Gothenburg for providing the resources and the community that made this possible.
+I would like to express my sincere appreciation to Ivan Di Liberti for giving me the opportunity to pursue the topics I find most interesting, and for his continuous support throughout this project. I am especially grateful that he connected me with Phokion Kolaitis, which led to the joint supervision of my master's thesis. I would also like to thank Phokion Kolaitis for agreeing to co-supervise my thesis despite his busy schedule, and for the attention and guidance he has generously provided. Of course, none of this would have been possible without the resources and community provided by the University of Gothenburg.
 
-I am deeply grateful to the people I have met during my time in Gothenburg and value the time we have spent together. Their kindness and support have been a great source of encouragement throughout my studies. I will look back on these years with gratitude for the people who made this journey so meaningful.
+I am deeply grateful to the people I have met during my time in Gothenburg and value the time we have spent together. Their kindness and support have been a great source of encouragement throughout my studies. I will look back on these years with gratitude for everyone who made this journey so meaningful.
 
-Finally, I want to express my heartfelt gratitude to my family. Thank you for your unwavering encouragement and for believing in my academic pursuits, I love you \foreignlanguage{greek}{ως τον ουρανόν}.
+Finally, I want to express my heartfelt gratitude to my family. Thank you for your unwavering encouragement and for believing in my academic pursuits. I love you \foreignlanguage{greek}{ως τον ουρανόν}.
 
-% \includegraphics[width=0.6\textwidth]{kite}
+% \includegraphics[width=0.6\textwidth]{img/kite}
 
 \begingroup
 \hypersetup{hidelinks}
@@ -144,7 +144,7 @@ Finally, I want to express my heartfelt gratitude to my family. Thank you for yo
 
 \chapter{Introduction}
 
-In database theory, provenance is a way of relating data in an output to the contributing data in the input. Such information is important for many data management tasks and is increasingly relevant in a world where vast amounts of data are used in a variety of ways.
+In database theory, provenance is a mechanism that relates data in an output to the contributing data in the input. Such information is important for many data management tasks and is increasingly relevant in a world where vast amounts of data are used in a variety of ways.
 
 We will focus on provenance for data residing in a relational database. Database provenance is typically represented as a general form of annotation information, by tagging data on the tuple-level or value-level of a database relation.
 
@@ -183,25 +183,25 @@ In this framework, the polynomial semiring $(\mathbb{N}[X], +, \cdot, 0, 1)$ is 
 
 Since the polynomial semiring enjoys this universal property, the variables in $X$ can be substituted with elements of any commutative semiring, yielding a unique homomorphism into that semiring. In this way, different provenance models (as well as database semantics) arise as specialisations of the polynomial semiring.
 
-This framework therefore allows for the evaluation of queries over any database by annotating source tuples with variables from an abstract set $X$. Under this approach, a relation is treated as an $\mathbb{N}[X]$-relation, where the provenance of each output tuple is expressed as a polynomial with natural number coefficients. These annotations propagate through query evaluation, where the semantics of the relational algebra operators are mapped directly to the addition and multiplication operations of the semiring. In the case of our example, the how-provenance of $(a,a)$ is the polynomial $\textbf{p}^3 + 2\textbf{pqr}$.
+This framework therefore allows for the evaluation of queries over any database by annotating source tuples with variables from an abstract set $X$. Under this approach, a relation is treated as an $\mathbb{N}[X]$-relation, where the provenance of each output tuple is expressed as a polynomial with natural number coefficients. These annotations propagate through query evaluation, where the semantics of the relational algebra operators are mapped directly to the addition and multiplication operations of the semiring. In the case of our example, the how-provenance of $(a,a)$ is the polynomial $\textbf{p}^3 + 2\textbf{pqr}$, which gives more precise information than the why-provenance does.
 
 \section{Outline}
 
 While the paper by Green et al. was influential, it focused on the positive fragment of the relational algebra, where set difference is not included, and only briefly addressed the inclusion of recursion in the framework.
 
-A significant body of further research has gone into extending the semiring framework to support more expressive queries. In what follows, we examine the results of the paper by Green et al. together with extensions of the framework.
+A significant body of further research has gone into extending the semiring framework to support more expressive queries. In what follows, we examine the results of the paper by Green et al. alongside subsequent extensions of the framework.
 
 More specifically, \autoref{chapter:background} provides relevant background knowledge on database theory and abstract algebra. \autoref{chapter:semirings} then presents the semiring-based framework for provenance. We show how the notions of relation, database, and the relational algebra are generalised to accommodate annotations. Furthermore, we confirm that in order for standard relational algebra identities to continue to hold in this generalisation, the underlying structure of the annotations must be a commutative semiring. We present the fundamental theorem, stating that query evaluation commutes with semiring homomorphisms. We then end the chapter by showing that the polynomial semiring serves as the provenance domain and provide examples of notable semirings it generalises.
 
-In \autoref{chapter:aggregation}, we investigate an extension of the semiring framework that facilitates the expression of aggregate queries. We show that semirings alone are insufficient for a uniform treatment of aggregation and consider the necessary algebraic modifications. We utilise the additional structure provided by semimodules and employ a tensor product construction as the provenance domain. We then define the operations of aggregation and grouping on the extended framework and conclude the chapter by demonstrating that the fundamental theorem continues to hold.
+In \autoref{chapter:aggregation}, we investigate an extension of the semiring framework that facilitates the expression of aggregate queries. We show that semirings alone are insufficient for a uniform treatment of aggregation and consider the necessary algebraic modifications. We utilise the additional structure provided by semimodules and employ a tensor product construction as the provenance domain. We then define the operations of aggregation and grouping on this extended stucture and conclude the chapter by demonstrating that the fundamental theorem continues to hold.
 
 \autoref{chapter:difference} provides a short survey of the various approaches used to define a difference operation in the semiring framework. Given that semirings lack additive inverses by definition, this presents a significant challenge. We classify these approaches into three main groups: the direct addition of algebraic identities to semirings, the use of a semiring's natural order to define a monus operator, and the construction of quotient semirings, ultimately evaluating the various trade-offs that each approach entails.
 
-Finally, \autoref{chapter:conclusion} reviews omissions and evaluates research challenges.
+Finally, \autoref{chapter:conclusion} reviews topics not covered and discusses research challenges.
 
 \section{Contributions}
 
-This thesis provides an accessible exposition of semiring-based provenance, presenting the foundational theory as well as important extensions. By combining intuitive explanation with technical rigour, the work translates specialised research into a structured narrative suitable for a graduate-level audience. The technical contributions of this work are as follows:
+This thesis provides an accessible exposition of semiring-based provenance, presenting the foundational theory, as well as important extensions. By combining intuitive explanation with technical rigour, the work translates specialised research into a structured narrative suitable for a graduate-level audience. The technical contributions of this work are as follows:
 \begin{itemize}
     \item Reformulated and proved the relationship between relational identities and the commutative semiring axioms in \autoref{prop:identitiesifcommsemiring}.
     \item Provided proofs for the fundamental theorem (\autoref{thm:fundamental}) and the universality of the provenance semiring (\autoref{cor:provenancesemiring}).
@@ -921,8 +921,8 @@ More specifically, these provenance models are:
     \item The Boolean provenance semiring, $\mathbb{B}[X]$, consists of polynomials analogous to those in $\mathbb{N}[X]$, but with Boolean coefficients, that is, with idempotent addition.
     \item Trio, a system developed at Stanford for managing provenance in uncertain databases \cite{Benjelloun2008}. The Trio provenance model can be obtained from $\mathbb{N}[X]$ by making multiplication idempotent, instead of addition.
     \item If both operations are made idempotent, we can retrieve the why-provenance model developed by Buneman et al. \cite{Buneman2001}. More specifically, we can use the following semiring to obtain why-provenance \cite{Cheney2009}: Why($X$) = $(\mathcal{P}(\mathcal{P}(X)), \emptyset, \{\emptyset\}, \cup, \cupcup)$, where $\cupcup$ takes all the pairwise unions of two collections: $\{s \cup t \mid s \in S, t \in T \}$.
-    \item From $\mathbb{B}[X]$ we can obtain Sorp($X$) by adopting the absorption law $a + a \cdot b = a$. Sorp($X$) consists of absorptive polynomials and is the absorptive commutative semiring freely generated by $X$.
-    \item PosBool($X$) is the set of (equivalent) positive Boolean expressions over a set of variables $X$; that is, expressions built using only conjunction and disjunction.
+    \item From $\mathbb{B}[X]$ we can obtain Sorp($X$) by adopting the absorption law $a + a \cdot b = a$. Sorp($X$) consists of absorptive polynomials and is the free absorptive commutative semiring over $X$.
+    \item Further down is PosBool($X$), consisting of Boolean expressions constructed using only conjunction and disjunction.
     \item Finally, we can obtain the lineage provenance model Lin($X$), as described in \cite{Cui2000}, by making addition and multiplication equal in the Why($X$) provenance model. The corresponding semiring is Lin($X$) = $(\mathcal{P}(X) \cup \{\bot\}, \bot, \emptyset, \cup_L, \cup_S)$, where $\cup_L$ denotes lazy union and $\cup_S$ denotes strict union, as defined by Cheney, Chiticariu, and Tan \cite{Cheney2009}.
 \end{itemize}
 
@@ -1082,7 +1082,7 @@ Before introducing this construction in detail, however, we first demonstrate th
 
     Now let $h: \mathbb{N}[a,b] \to \mathbb{N}$ be the homomorphism defined by $h(a)=1$ and $h(b)=0$.
 
-    Applying $h_{Rel}$ first gives $\{(t_1, 1), (t_2, 0)\}$. Evaluating $Q$ yields a tuple with value $2$ and annotation $1$. Conversely, applying $Q$ and then $h_{Rel}$ yields a tuple with value $5$ and annotation $1$.
+    Applying $h_{Rel}$ first gives $\{(t_1, 1), (t_2, 0)\}$. Evaluating $Q$ yields a result tuple with value $2$ and annotation $1$. Conversely, evaluating $Q$ and then applying $h_{Rel}$ yields a result tuple with value $5$ and annotation $1$.
 
     Therefore, $Q(h_{Rel}(D)) \neq h_{Rel}(Q(D))$, contradicting the assumption.
 \end{proof}
@@ -1125,11 +1125,11 @@ We then require the pairing map $\ast : S \times M \to M$, for a commutative mon
 
 These axioms ensure that aggregation interacts coherently with both the semiring structure of the annotations and the monoid structure of the aggregation domain. In particular, they generalise the behaviour of multiplication under bag semantics.
 
-The set of $S$-relations over attribute set $U$, viewed as finitely supported functions $R : \mathbb{D}^U \to S$, forms a free $S$-semimodule $(S^{(\mathbb{D}^U)}, \cup, \emptyset, \ast)$, where $(s \ast R)(t) = s \cdot_S R(t)$. Consequently, it is natural to view aggregation as a semimodule homomorphism from the space of relations to the aggregation domain. It follows that aggregation in an $S$-semimodule is algebraically uniform, since an aggregate value is computed as a finite expression of the form
+The set of $S$-relations over attribute set $U$, viewed as finitely supported functions $R : \mathbb{D}^U \to S$, forms a free $S$-semimodule $(S^{(\mathbb{D}^U)}, \cup, \emptyset, \ast)$, where $(s \ast R)(t) = s \cdot_S R(t)$. Consequently, it is natural to formalise aggregation as a semimodule homomorphism from the space of relations to the aggregation domain $M$. Under this interpretation, the result of an aggregate query is expressed as a finite sum of the form
 \[
     s_1 \ast m_1 +_M \dots +_M s_n \ast m_n,
 \]
-where $s_i \in S$ are annotations and $m_i \in M$ are values from the aggregation domain. We therefore assume an $S$-semimodule structure on our relations.
+where $s_i \in S$ are annotations and $m_i \in M$ are the corresponding data values from the aggregation domain. We therefore assume an $S$-semimodule structure on our relations.
 
 We now record two useful facts about semimodules.
 
@@ -1159,11 +1159,11 @@ We now record two useful facts about semimodules.
     Suppose $M$ is an idempotent commutative monoid. We define scalar multiplication $\ast : \mathbb{B} \times M \to M$ by $1 \ast m = m$ and $0 \ast m = 0_M$. The semimodule axioms follow immediately from the properties of the Boolean semiring together with idempotence of the monoid operation.
 \end{proof}
 
-Since, by \autoref{prop:allcommutativemonoidsNsemimodules}, every commutative monoid can be extended to an $\mathbb{N}$-semimodule, the framework recovers the usual bag semantics for aggregation: in particular, it supports standard operations such as $\texttt{SUM}$, $\texttt{MIN}$, and $\texttt{MAX}$ over bags. Moreover, since $\texttt{MIN}$ and $\texttt{MAX}$ form idempotent commutative monoids, using \autoref{prop:Bsemimoduleiffidempotentmonoid}, they can be extended to a $\mathbb{B}$-semimodule and therefore yield the standard set semantics of $\texttt{MIN}$ and $\texttt{MAX}$ over sets.
+Since, by \autoref{prop:allcommutativemonoidsNsemimodules}, every commutative monoid can be extended to an $\mathbb{N}$-semimodule, the framework recovers the usual bag semantics for aggregation: in particular, it supports standard operations such as $\texttt{SUM}$, $\texttt{MIN}$, and $\texttt{MAX}$ over bags. Moreover, since $\texttt{MIN}$ and $\texttt{MAX}$ form idempotent commutative monoids, using \autoref{prop:Bsemimoduleiffidempotentmonoid}, they can be extended to $\mathbb{B}$-semimodules and therefore yield the standard set semantics of $\texttt{MIN}$ and $\texttt{MAX}$ over sets.
 
 In general however, an arbitrary commutative monoid $M$ does not have an inherent $S$-semimodule structure. To make it such we define an extended aggregation domain.
 
-The process is as follows: We consider the free commutative monoid generated by $S \times M$. An element of this set is a formal sum of the form:
+The process is as follows: We consider the free commutative monoid generated by $S \times M$. An element of this monoid is a formal sum of the form:
 \[
     \sum_{i=1}^n s_i \otimes m_i
 \]
@@ -1325,7 +1325,7 @@ For non-idempotent monoids like $\texttt{SUM}$, compatibility is more restrictiv
     \[
         (h \circ \iota)(m) = h(1_S \otimes m) = f(1_S) \ast_{\mathbb{N}} m = 1_{\mathbb{N}} \ast_{\mathbb{N}} m = m.
     \]
-    As $h \circ \iota$ is the identity, $\iota$ is injective for any monoid $M$.
+    As $h \circ \iota$ is the identity, $\iota$ is injective for any commutative monoid $M$.
 \end{proof}
 
 As we have seen, idempotent semirings are suitable for operations like MIN and MAX, but they are inherently incompatible with non-idempotent aggregations such as SUM. To accommodate such aggregates, we can construct a bag-extended semiring that preserves the multiplicative structure of $S$ while allowing the additive structure to track multiplicities through the use of polynomials.
@@ -1342,9 +1342,9 @@ We begin with the semiring of polynomials $\mathbb{N}[S]$, where the variables a
 The existence of a homomorphism $f : S{\mathbb{N}} \to \mathbb{N}$ ensures that $S{\mathbb{N}}$ satisfies the condition for universal compatibility established in \autoref{thm:ifhomomorphismsthencompatible}.
 
 \begin{exmpl}
-    To illustrate this construction, consider an idempotent semiring $S$ and the monoid $M = \text{SUM}$. Suppose a query identifies the value $10$ through two distinct paths, annotated with $a$ and $b$. In the standard tensor domain $S \otimes \text{SUM}$, these combine as $(a +_S b) \otimes 10$. If both paths are present ($a = b = 1_S$), the idempotency of $S$ causes the result to collapse: $(1_S +_S 1_S) \otimes 10 = 1_S \otimes 10$. This loses the information that the value $10$ occurred twice, leading to an incorrect sum of $10$ instead of $20$.
+    To illustrate this construction, consider an idempotent semiring $S$ and the monoid $M = \text{SUM}$. Suppose a query identifies the value $10$ through two distinct paths, annotated with $a$ and $b$. In the standard tensor domain $S \otimes \text{SUM}$, these combine as $(a +_S b) \otimes 10$. If both paths are present ($a = b = 1_S$), the idempotency of $S$ causes the result to collapse: $(1_S +_S 1_S) \otimes 10 = 1_S \otimes 10$. We therefore lose the information that the value $10$ occurred twice, leading to an incorrect sum of $10$ instead of $20$.
 
-    In the bag-extended domain $S{\mathbb{N}} \otimes \text{SUM}$, the same result is represented as $(1 \cdot a + 1 \cdot b) \otimes 10$. By mapping $S{\mathbb{N}}$ to $\mathbb{N}$ ($a, b \mapsto 1$), the coefficient $(1 \cdot 1 + 1 \cdot 1)$ evaluates to $2$. The result then correctly simplifies to $2 \otimes 10$, which represents the expected sum of $20$.
+    In the bag-extended domain $S{\mathbb{N}} \otimes \text{SUM}$, the same result is represented as $(1 \cdot a + 1 \cdot b) \otimes 10$. By specialising this result via a homomorphism $f: S\mathbb{N} \to \mathbb{N}$ (mapping $a, b \mapsto 1$), the coefficient $1 \cdot a + 1 \cdot b$ evaluates to $2$. The result then correctly becomes $2 \otimes 10$, which yields the expected sum of $20$.
 \end{exmpl}
 
 We have thus far considered aggregation in a limited context: when it is the last operation of the query. In the following section, we generalise this framework to account for arbitrarily complex queries, where aggregation and grouping may appear as intermediate steps.
@@ -1362,14 +1362,14 @@ More specifically, we introduce to the semiring $S$ new expressions of the form 
     \begin{center}
         \begin{tabular}{|c|c|c}
             \cline{1-2}
-            cust\_id & price                             &                                                                                \\ \cline{1-2}
-            vsdjp    & $o_1 \otimes 30$                  & $\delta(o_1)\cdot_S [o_1 \otimes 30 = 1_S \otimes 40]$                         \\
-            bjvks    & $o_2 \otimes 40$                  & $\delta(o_2) \cdot_S [o_2 \otimes 40 = 1_S \otimes 40]$                        \\
-            hcbja    & $o_3 \otimes 20 + o_4 \otimes 20$ & $\delta(o_3 + o_4) \cdot_S [o_3 \otimes 20 + o_4 \otimes 20 = 1_S \otimes 40]$ \\ \cline{1-2}
+            cust\_id & price                             &                                                                            \\ \cline{1-2}
+            vsdjp    & $o_1 \otimes 30$                  & $\delta(o_1)\cdot [o_1 \otimes 30 = 1 \otimes 40]$                         \\
+            bjvks    & $o_2 \otimes 40$                  & $\delta(o_2) \cdot [o_2 \otimes 40 = 1 \otimes 40]$                        \\
+            hcbja    & $o_3 \otimes 20 + o_4 \otimes 20$ & $\delta(o_3 + o_4) \cdot [o_3 \otimes 20 + o_4 \otimes 20 = 1 \otimes 40]$ \\ \cline{1-2}
         \end{tabular}
     \end{center}
 
-    These equality expressions remain symbolic until the query is specialised via a homomorphism to a concrete semiring, at which point the comparisons can be replaced by $1_S$ (if the equality holds) or $0_S$ (otherwise).
+    These equality expressions remain symbolic until the query is specialised via a homomorphism to a concrete semiring, at which point the comparisons can be replaced by $1$ (if the equality holds) or $0$ (otherwise).
 \end{exmpl}
 
 We now formalise the treatment of complex aggregate queries by constructing an extended structure.
@@ -1378,19 +1378,18 @@ We now formalise the treatment of complex aggregate queries by constructing an e
     We define a semiring $\widehat{S} = \mathbb{N}[S \cup \{ [c_1 = c_2] \mid c_1, c_2 \in S \otimes M \}]$, which treats equality expressions as additional variables. We then define $S^M$ as the quotient of $\widehat{S}$ by a congruence relation $\sim$ satisfying the following identities for all $s_i \in S$ and $c_i \in S \otimes M$:
     \[
         \begin{aligned}
-            0_{\widehat{S}}              & \sim 0_S                                     \\
-            1_{\widehat{S}}              & \sim 1_S                                     \\
-            s_1 +_{\widehat{S}} s_2      & \sim s_1 +_S s_2                             \\
-            s_1 \cdot_{\widehat{S}} s_2  & \sim s_1 \cdot_S s_2                         \\
-            [c_1 = c_3] \sim [c_2 = c_4] & \text{ if } c_1 = c_2 \text{ and } c_3 = c_4
+            0_{\widehat{S}}             & \sim 0_S             \\
+            1_{\widehat{S}}             & \sim 1_S             \\
+            s_1 +_{\widehat{S}} s_2     & \sim s_1 +_S s_2     \\
+            s_1 \cdot_{\widehat{S}} s_2 & \sim s_1 \cdot_S s_2
         \end{aligned}
     \]
-    When $\iota: M \to S \otimes M$ is an isomorphism (with inverse $h$), we can resolve these equality expressions. In that case, we further impose the following identities for all $a,b \in S \otimes M$:
+    When $\iota: M \to S \otimes M$ is an isomorphism (with inverse $h$), we can resolve these equality expressions. In that case, we further impose the following identities:
     \[
-        [a = b] \sim
+        [c_1 = c_2] \sim
         \begin{cases}
-            1_S & \text{if } h(a) =_M h(b)    \\
-            0_S & \text{if } h(a) \neq_M h(b)
+            1_S & \text{if } h(c_1) =_M h(c_2)    \\
+            0_S & \text{if } h(c_1) \neq_M h(c_2)
         \end{cases}
     \]
 \end{defn}
@@ -1711,7 +1710,7 @@ One shortcoming of m-semirings is that the monus operation relies exclusively on
 
 Despite this limitation, Badia, Kolaitis, and Noguera \cite{Badia2025} defend the m-semiring approach (and go on to prove Codd's theorem for databases over m-semirings), arguing that this is an acceptable trade-off. They justify this stance on three grounds.
 
-Firstly, the class of m-semirings remains sufficiently broad, encompassing most of the important semirings. Secondly, they believe that the failure of certain identities within m-semirings should not be treated as problematic, given that arbitrary commutative semirings already lack other fundamental identities regardless of this extension. Finally, and perhaps most importantly from a practical standpoint, the m-semiring axioms faithfully reflect the semantics of the difference operation in SQL.
+Firstly, the class of m-semirings remains sufficiently broad, encompassing most of the important semirings. Secondly, they believe that the failure of certain identities within m-semirings should not be treated as problematic, given that arbitrary commutative semirings already lack other fundamental identities. Finally, and perhaps most importantly from a practical standpoint, the m-semiring axioms faithfully reflect the semantics of the difference operation in SQL.
 
 \section{Quotient constructions}
 
@@ -1723,7 +1722,7 @@ While various extensions have attempted to model the difference of relations, th
 
 Let $\tau$ be a finite relational vocabulary and $A$ be a finite, non-empty universe. From these, we construct the set $\text{Facts}_A(\tau)$ of all ground relational atoms and the set $\text{NegFacts}_A(\tau)$ of their negations. The union of these sets forms the set of literals over $\tau$ and $A$: $\text{Lit}_{A}(\tau) = \text{Facts}_{A}(\tau) \ \cup \ \text{NegFacts}_{A}(\tau)$.
 
-We utilise a semiring $\mathcal{S} = (S, +, \cdot, 0, 1)$ to interpret these assertions. The element 0 represents false assertions, while any nonzero element provides an annotated interpretation of true assertions.
+We utilise a commutative semiring $\mathcal{S} = (S, +, \cdot, 0, 1)$ to interpret these assertions. The element 0 represents false assertions, while any nonzero element provides an annotated interpretation of true assertions.
 
 The semantics is formalised through an $\mathcal{S}$-interpretation, which maps literals to elements of the semiring, and is then extended to all first-order formulae. Because the semiring does not provide a direct mechanism for negation, we adopt the syntactic transformation to negation normal form (NNF), denoted by $\varphi \mapsto \text{nnf}(\varphi)$, which ensures that negations only appear at the level of literals.
 
@@ -2007,7 +2006,7 @@ Despite significant progress, several important challenges remain within the fie
 
 A persistent challenge lies in the trade-off between the generality of a provenance representation and its practical computational feasibility. This is best illustrated by the role of the provenance semiring $\mathbb{N}[X]$. As the free commutative semiring, $\mathbb{N}[X]$ provides the most general representation. This universality is theoretically indispensable, as it allows a single symbolic calculation to serve a broad spectrum of applications. However, this high degree of generality comes at a substantial practical cost. The storage requirements for these polynomials, and the computational overhead required to manipulate them, impose significant performance constraints on large data environments. Therefore, a key objective of research is to identify a balance between the generality and practicality of different provenance representations \cite{Glavic2021}.
 
-In a similar vein, we claim that commutative semirings are not sufficiently general. While their axioms ensure the commutativity and associativity of addition and multiplication, these properties result in a loss of structural provenance information as they obscure the sequence of operations (as evidenced by \autoref{query:3edges} on \autoref{fig:edges}). We suggest that for a richer provenance framework to be realised, research must look towards non-commutative and non-associative algebraic structures that can document the full history of a data transformation.
+In a similar vein, we claim that commutative semirings are not sufficiently general. While their axioms ensure the commutativity and associativity of addition and multiplication, these properties result in a loss of structural provenance information as they obscure the sequence of operations (as evidenced by \autoref{query:3edges} on \autoref{fig:edges}). To realise a richer provenance framework, research must look to non-commutative and non-associative algebraic structures capable of documenting the full history of a data transformation.
 
 \printbibliography
 
