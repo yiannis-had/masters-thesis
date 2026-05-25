@@ -1,6 +1,7 @@
 \documentclass{beamer}
 
 \usetheme{Madrid}
+\usecolortheme{seahorse}
 
 \usepackage{amsmath, amssymb}
 \usepackage{tikz}
@@ -12,62 +13,58 @@
 
 \begin{document}
 
-
 \begin{frame}
   \titlepage
 \end{frame}
 
 \begin{frame}{What is a database?}
+  \pause
   \centering
-  % Resizebox ensures the entire diagram fits perfectly within the slide margins
   \resizebox{0.95\textwidth}{!}{%
     \begin{tikzpicture}[
         node distance=0.6cm and 1.5cm,
         font=\footnotesize\sffamily
       ]
-
       % Compact table row height and column padding for slide layout
       \renewcommand{\arraystretch}{1.15}
       \setlength{\tabcolsep}{5pt}
 
       % ==================== TABLES ====================
-
-      \node (Transaction) [align=center] {
-        \textit{Transactions} \\[0.15cm]
+      \node (Loans) [align=center] {
+        \textit{Loans} \\[0.15cm]
         \begin{tabular}{|c|c|c|c|c|}
           \hline
-          \textbf{Transaction ID} & \textbf{Customer ID} & \textbf{Product ID} & \textbf{Purchase date} & \textbf{Quantity} \\ \hline
-          43666                   & 24221                & 389                 & 17-02-2026             & 2                 \\ \hline
-          43666                   & 24221                & 879                 & 17-02-2026             & 3                 \\ \hline
-          43952                   & 24222                & 975                 & 17-02-2026             & 1                 \\ \hline
-          54673                   & 24223                & 389                 & 28-02-2026             & 2                 \\ \hline
-          58930                   & 24224                & 975                 & 09-03-2026             & 3                 \\ \hline
-          58930                   & 24224                & 879                 & 09-03-2026             & 5                 \\ \hline
-          59927                   & 24223                & 789                 & 10-03-2026             & 4                 \\ \hline
+          \textbf{Loan\_id} & \textbf{Member\_id} & \textbf{Book\_id} & \textbf{Borrow\_date} & \textbf{Duration} \\ \hline
+          43666             & 4221                & 389               & 17-02-2026            & 7                 \\ \hline
+          43666             & 4221                & 782               & 17-02-2026            & 7                 \\ \hline
+          43952             & 4222                & 975               & 17-02-2026            & 30                \\ \hline
+          54673             & 4223                & 389               & 06-03-2026            & 14                \\ \hline
+          58930             & 4224                & 975               & 09-03-2026            & 30                \\ \hline
+          58930             & 4224                & 879               & 09-03-2026            & 30                \\ \hline
         \end{tabular}
       };
 
-      \node (Product) [align=center, right=1.5cm of Transaction.east, anchor=south west, yshift=0.3cm] {
-        \textit{Products} \\[0.15cm]
-        \begin{tabular}{|c|c|c|}
+      \node (Books) [align=center, right=1.5cm of Loans.east, anchor=south west, yshift=0.3cm] {
+        \textit{Books} \\[0.15cm]
+        \begin{tabular}{|c|c|c|c|}
           \hline
-          \textbf{Product ID} & \textbf{Product name} & \textbf{Price per kg} \\ \hline
-          389                 & Avocado               & 5                     \\ \hline
-          789                 & Banana                & 2                     \\ \hline
-          879                 & Mango                 & 6                     \\ \hline
-          975                 & Watermelon            & 3                     \\ \hline
+          \textbf{Book\_id} & \textbf{Book\_title}    & \textbf{Genre} & \textbf{Copies} \\ \hline
+          389               & Nineteen Eighty-Four    & Fiction        & 5               \\ \hline
+          782               & Brave New World         & Fiction        & 4               \\ \hline
+          879               & Divine Comedy           & Poetry         & 6               \\ \hline
+          975               & Critique of Pure Reason & Philosophy     & 3               \\ \hline
         \end{tabular}
       };
 
-      \node (Customer) [align=center, right=1.5cm of Transaction.east, anchor=north west, yshift=-0.3cm] {
-        \textit{Customers} \\[0.15cm]
+      \node (Members) [align=center, right=1.5cm of Loans.east, anchor=north west, yshift=-0.3cm] {
+        \textit{Members} \\[0.15cm]
         \begin{tabular}{|c|c|c|}
           \hline
-          \textbf{Customer ID} & \textbf{First name} & \textbf{Last name} \\ \hline
-          24221                & Aditya              & Prakash            \\ \hline
-          24222                & Graham              & Leigh              \\ \hline
-          24223                & Ivan                & Di Liberti         \\ \hline
-          24224                & Luigi               & Brunetta           \\ \hline
+          \textbf{Member\_id} & \textbf{First\_name} & \textbf{Last\_name} \\ \hline
+          4221                & Aditya               & Prakash             \\ \hline
+          4222                & Graham               & Leigh               \\ \hline
+          4223                & Ivan                 & Di Liberti          \\ \hline
+          4224                & Luigi                & Brunetta            \\ \hline
         \end{tabular}
       };
 
@@ -92,23 +89,32 @@
 \end{frame}
 
 \begin{frame}{How do we query a database?}
-  Relational algebra is an algebraic formalism in which queries are expressed by applying a sequence of operations to relations.\pause
+
+  A query specifies how new relations can be derived from an existing database. Relational algebra is an algebraic formalism in which queries are expressed by applying a sequence of operations to relations.\pause
 
   \bigskip
-  
+
   The \emph{relational algebra} consists of the following operations:
   \begin{itemize}
     \item Selection, $\sigma_\theta(R)$: Keep tuples satisfying condition $\theta$
     \item Projection, $\pi_L(R)$: Keep only attributes $L$
     \item Natural join, $R \bowtie S$: Merge tuples matching on common attributes
     \item Renaming, $\rho_\beta(R)$: Rename attributes according to $\beta$
-    \item Union, $R \cup S$: Combine unique tuples
+    \item Union, $R \cup S$: Combine tuples present in $R$ or in $S$
     \item Difference, $R - S$: Keep tuples present in $R$ but not in $S$
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Example}
-  Find all the times a mango or banana was purchased
+  Query: Find the title of any book borrowed for 7 or 14 days.\pause
+
+  \bigskip
+
+  In relational algebra we can express it with the following expression:
+  \[
+    \pi_{Book\_title}(\sigma_{Duration=7}(Loans \bowtie Books) \cup \sigma_{Duration=14}(Loans \bowtie Books))
+  \]
+
 \end{frame}
 
 \begin{frame}{What is database provenance?}
@@ -116,7 +122,55 @@
 
   \bigskip
 
-  Provenance is typically represented as a form of annotation information, usually by tagging data on the tuple-level of a relation.
+  It is typically represented as a form of annotation information, usually by tagging data on the tuple-level of a relation.
+\end{frame}
+
+\begin{frame}{What is database provenance?}
+  \centering
+  \resizebox{0.95\textwidth}{!}{%
+    \renewcommand{\arraystretch}{1.15}%
+    \setlength{\tabcolsep}{6pt}%
+    \begin{tabular}{@{}c@{\hspace{1.5cm}}c@{}}
+      \begin{tabular}{@{}c@{}}
+        \textit{Loans} \\[0.15cm]
+        \begin{tabular}{|c|c|c|c|c|l}
+          \cline{1-5}
+          \textbf{Loan\_id} & \textbf{Member\_id} & \textbf{Book\_id} & \textbf{Borrow\_date} & \textbf{Duration} &                     \\ \cline{1-5}
+          43666             & 4221                & 389               & 17-02-2026            & 7                 & \uncover<2->{$l_1$} \\ \cline{1-5}
+          43666             & 4221                & 782               & 17-02-2026            & 7                 & \uncover<2->{$l_2$} \\ \cline{1-5}
+          43952             & 4222                & 975               & 17-02-2026            & 30                & \uncover<2->{$l_3$} \\ \cline{1-5}
+          54673             & 4223                & 389               & 06-03-2026            & 14                & \uncover<2->{$l_4$} \\ \cline{1-5}
+          58930             & 4224                & 975               & 09-03-2026            & 30                & \uncover<2->{$l_5$} \\ \cline{1-5}
+          58930             & 4224                & 879               & 09-03-2026            & 30                & \uncover<2->{$l_6$} \\ \cline{1-5}
+        \end{tabular}
+      \end{tabular}
+
+       &
+      \begin{tabular}{@{}c@{}}
+        \textit{Books}   \\[0.15cm]
+        \begin{tabular}{|c|c|c|c|l}
+          \cline{1-4}
+          \textbf{Book\_id} & \textbf{Book\_title}    & \textbf{Genre} & \textbf{Copies} &                     \\ \cline{1-4}
+          389               & Nineteen Eighty-Four    & Fiction        & 5               & \uncover<2->{$b_1$} \\ \cline{1-4}
+          782               & Brave New World         & Fiction        & 4               & \uncover<2->{$b_2$} \\ \cline{1-4}
+          879               & Divine Comedy           & Poetry         & 6               & \uncover<2->{$b_3$} \\ \cline{1-4}
+          975               & Critique of Pure Reason & Philosophy     & 3               & \uncover<2->{$b_4$} \\ \cline{1-4}
+        \end{tabular}
+
+        \\[1.8cm]
+
+        \textit{Members} \\[0.15cm]
+        \begin{tabular}{|c|c|c|l}
+          \cline{1-3}
+          \textbf{Member\_id} & \textbf{First\_name} & \textbf{Last\_name} &                     \\ \cline{1-3}
+          4221                & Aditya               & Prakash             & \uncover<2->{$m_1$} \\ \cline{1-3}
+          4222                & Graham               & Leigh               & \uncover<2->{$m_2$} \\ \cline{1-3}
+          4223                & Ivan                 & Di Liberti          & \uncover<2->{$m_3$} \\ \cline{1-3}
+          4224                & Luigi                & Brunetta            & \uncover<2->{$m_4$} \\ \cline{1-3}
+        \end{tabular}
+      \end{tabular}
+    \end{tabular}%
+  }
 \end{frame}
 
 
@@ -124,29 +178,10 @@
 \end{frame}
 
 \begin{frame}{Semiring framework}
-  Main idea: have the values for the annotations come from a semiring. \pause
-
-  The most general of all being the polynomial semiring $(\mathbb{N}[\mathrm{X}], +, \cdot,0,1)$. \pause
-
-  The provenance for $(a, a)$ from our query from the previous slide would be the polynomial $p^3 + 2pqr$.
-\end{frame}
-
-\begin{frame}{Positive relational algebra}
-  The original paper translated the following relational algebra operations into the semiring framework with the $+$ and $\cdot$ operations: \pause
-  \begin{itemize}
-    \item \alt<6->{\textbf{S}}{S}election (filter tuples): $\sigma_\theta(R)$ \pause
-    \item \alt<6->{\textbf{P}}{P}rojection (remove/rearrange attributes): $\pi_L(R)$ \pause
-    \item \alt<6->{\textbf{C}}{C}artesian product: $R \times S$ \pause
-    \item \alt<6->{\textbf{U}}{U}nion (add tuples): $R \cup S$ \pause
-  \end{itemize}
 \end{frame}
 
 \begin{frame}{Extending the semiring framework}
-  Extensive work has been carried out to extend the semiring framework to more expressive query languages with: \pause
-  \begin{itemize}
-    \item Aggregation \pause
-    \item Difference
-  \end{itemize}
+  Extensive work has been carried out to extend the semiring framework to more expressive
 \end{frame}
 
 \begin{frame}{Aggregate queries}
@@ -221,20 +256,6 @@
 
 \begin{frame}{Aggregation provenance}
 
-\end{frame}
-
-\begin{frame}{Difference in provenance}
-
-\end{frame}
-
-
-\begin{frame}{Approaches to difference}
-  Several researchers proposed different ways to define difference on semiring-based databases. \pause
-  \begin{itemize}
-    \item Specifying a set of equations \pause
-    \item Monus operation on naturally ordered semirings \pause
-    \item Quotient constructions
-  \end{itemize}
 \end{frame}
 
 \begin{frame}{Open challenges}
