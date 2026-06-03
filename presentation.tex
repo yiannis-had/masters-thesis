@@ -6,10 +6,11 @@
 \usepackage{amsmath, amssymb}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta, positioning, matrix}
+\usepackage{colortbl}
 
 \title{Semirings for database provenance}
 \author{Yiannis Hadjicharalambous}
-\date{4 June 2026}
+\date{5 June 2026}
 
 \begin{document}
 
@@ -18,45 +19,39 @@
 \end{frame}
 
 \begin{frame}{What is a database?}
-  \pause
   \centering
-  \resizebox{0.95\textwidth}{!}{%
-    \begin{tikzpicture}[
-        node distance=0.6cm and 1.5cm,
-        font=\footnotesize\sffamily
-      ]
-      % Compact table row height and column padding for slide layout
-      \renewcommand{\arraystretch}{1.15}
-      \setlength{\tabcolsep}{5pt}
-
-      % ==================== TABLES ====================
-      \node (Loans) [align=center] {
+  \resizebox{\textwidth}{!}{
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{5pt}
+    \begin{tabular}{@{}c@{\hspace{1.5cm}}c@{}}
+      \begin{tabular}{@{}c@{}}
         \textit{Loans} \\[0.15cm]
         \begin{tabular}{|c|c|c|c|c|}
           \hline
           \textbf{Loan\_id} & \textbf{Member\_id} & \textbf{Book\_id} & \textbf{Borrow\_date} & \textbf{Duration} \\ \hline
           43666             & 4221                & 389               & 17-02-2026            & 7                 \\ \hline
-          43666             & 4221                & 782               & 17-02-2026            & 7                 \\ \hline
+          43666             & 4221                & 450               & 17-02-2026            & 7                 \\ \hline
           43952             & 4222                & 975               & 17-02-2026            & 30                \\ \hline
           54673             & 4223                & 389               & 06-03-2026            & 14                \\ \hline
           58930             & 4224                & 975               & 09-03-2026            & 30                \\ \hline
           58930             & 4224                & 879               & 09-03-2026            & 30                \\ \hline
         \end{tabular}
-      };
+      \end{tabular}
 
-      \node (Books) [align=center, right=1.5cm of Loans.east, anchor=south west, yshift=0.3cm] {
-        \textit{Books} \\[0.15cm]
+       &
+      \begin{tabular}{@{}c@{}}
+        \textit{Books}   \\[0.15cm]
         \begin{tabular}{|c|c|c|c|}
           \hline
           \textbf{Book\_id} & \textbf{Book\_title}    & \textbf{Genre} & \textbf{Copies} \\ \hline
           389               & Nineteen Eighty-Four    & Fiction        & 5               \\ \hline
-          782               & Brave New World         & Fiction        & 4               \\ \hline
+          450               & Brave New World         & Fiction        & 4               \\ \hline
           879               & Divine Comedy           & Poetry         & 6               \\ \hline
           975               & Critique of Pure Reason & Philosophy     & 3               \\ \hline
         \end{tabular}
-      };
 
-      \node (Members) [align=center, right=1.5cm of Loans.east, anchor=north west, yshift=-0.3cm] {
+        \\[1.8cm]
+
         \textit{Members} \\[0.15cm]
         \begin{tabular}{|c|c|c|}
           \hline
@@ -66,78 +61,135 @@
           4223                & Ivan                 & Di Liberti          \\ \hline
           4224                & Luigi                & Brunetta            \\ \hline
         \end{tabular}
-      };
-
-    \end{tikzpicture}%
+      \end{tabular}
+    \end{tabular}
   }
 \end{frame}
 
 \begin{frame}{What is a database?}
-  We assume:
+  We assume:\pause
   \begin{itemize}
-    \item a countably infinite set of constants (values) $\mathbb{D}$, called the \emph{domain}.\pause
-    \item a totally ordered countably infinite set $\mathcal{U}$ of \emph{attribute names}. We use the symbols $U,V$ for finite subsets of $\mathcal{U}$.\pause
+    \item a countably infinite set of values $\mathbb{D}$, called the \emph{domain}.\pause
+    \item a totally ordered countably infinite set $\mathcal{U}$ of \emph{attribute names}. We use $U$ to denote a finite subset of $\mathcal{U}$.\pause
   \end{itemize}
 
-  We define:
-
+  We define:\pause
   \begin{itemize}
     \item A \emph{tuple} as a function $t : U \to \mathbb{D}$.\pause
     \item A \emph{relation} $R$ as a finite set of tuples over $U$.\pause
-    \item A \emph{database} $D$ as a finite set of relations.
+    \item A \emph{database} $D$ as a finite set of relations.\pause
   \end{itemize}
+
+  \bigskip
+
+  $\{(\textbf{Member\_id}, 4221), (\textbf{First\_name}, \text{Aditya}), (\textbf{Last\_name}, \text{Prakash})\} \in Members$
 \end{frame}
 
-\begin{frame}{How do we query a database?}
+\begin{frame}{How do we ask questions?}
+  \pause
+  \only<2>{\begin{center}\Large\textbf{With queries!}\end{center}}
+  \pause
+  Loosely, a query takes a database and returns a new relation.
 
-  A query specifies how new relations can be derived from an existing database. Relational algebra is an algebraic formalism in which queries are expressed by applying a sequence of operations to relations.\pause
+  \pause
+
+  In relational algebra, queries are expressed by applying transformations to relations.\pause
 
   \bigskip
 
   The \emph{relational algebra} consists of the following operations:
   \begin{itemize}
-    \item Selection, $\sigma_\theta(R)$: Keep tuples satisfying condition $\theta$
-    \item Projection, $\pi_L(R)$: Keep only attributes $L$
-    \item Natural join, $R \bowtie S$: Merge tuples matching on common attributes
-    \item Renaming, $\rho_\beta(R)$: Rename attributes according to $\beta$
-    \item Union, $R \cup S$: Combine tuples present in $R$ or in $S$
-    \item Difference, $R - S$: Keep tuples present in $R$ but not in $S$
+    \item Selection: $\sigma_\theta(R)$
+    \item Projection: $\pi_L(R)$
+    \item Renaming: $\rho_\beta(R)$
+    \item Natural join: $R \bowtie S$
+    \item Union: $R \cup S$
+    \item Difference: $R - S$
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Example}
-  Query: Find the title of any book borrowed for 7 or 14 days.\pause
+\begin{frame}{Example query}
+  \centering
+  Query: Find the title of every book borrowed for 7 or 14 days.
+  \vfill
+
+  \resizebox{\textwidth}{!}{
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{5pt}
+    \begin{tabular}{@{}c@{\hspace{1.5cm}}c@{}}
+      \begin{tabular}{@{}c@{}}
+        \textit{Loans} \\[0.15cm]
+        \begin{tabular}{|c|c|c|c|c|}
+          \hline
+          \textbf{Loan\_id} & \textbf{Member\_id} & \textbf{Book\_id} & \textbf{Borrow\_date} & \textbf{Duration} \\ \hline
+          43666             & 4221                & 389               & 17-02-2026            & 7                 \\ \hline
+          43666             & 4221                & 450               & 17-02-2026            & 7                 \\ \hline
+          43952             & 4222                & 975               & 17-02-2026            & 30                \\ \hline
+          54673             & 4223                & 389               & 06-03-2026            & 14                \\ \hline
+          58930             & 4224                & 975               & 09-03-2026            & 30                \\ \hline
+          58930             & 4224                & 879               & 09-03-2026            & 30                \\ \hline
+        \end{tabular}
+      \end{tabular}
+
+       &
+      \begin{tabular}{@{}c@{}}
+        \textit{Books}   \\[0.15cm]
+        \begin{tabular}{|c|c|c|c|}
+          \hline
+          \textbf{Book\_id} & \textbf{Book\_title}    & \textbf{Genre} & \textbf{Copies} \\ \hline
+          389               & Nineteen Eighty-Four    & Fiction        & 5               \\ \hline
+          450               & Brave New World         & Fiction        & 4               \\ \hline
+          879               & Divine Comedy           & Poetry         & 6               \\ \hline
+          975               & Critique of Pure Reason & Philosophy     & 3               \\ \hline
+        \end{tabular}
+
+        \\[1.8cm]
+
+        \textit{Members} \\[0.15cm]
+        \begin{tabular}{|c|c|c|}
+          \hline
+          \textbf{Member\_id} & \textbf{First\_name} & \textbf{Last\_name} \\ \hline
+          4221                & Aditya               & Prakash             \\ \hline
+          4222                & Graham               & Leigh               \\ \hline
+          4223                & Ivan                 & Di Liberti          \\ \hline
+          4224                & Luigi                & Brunetta            \\ \hline
+        \end{tabular}
+      \end{tabular}
+    \end{tabular}
+  }\pause
 
   \bigskip
 
-  In relational algebra we can express it with the following expression:
-  \[
-    \pi_{Book\_title}(\sigma_{Duration=7}(Loans \bowtie Books) \cup \sigma_{Duration=14}(Loans \bowtie Books))
-  \]
-
+  $\pi_{Book\_title}\Bigl(\sigma_{Duration=7}(Loans \bowtie Books) \cup \sigma_{Duration=14}(Loans \bowtie Books)\Bigr)$
 \end{frame}
 
 \begin{frame}{What is database provenance?}
-  Provenance is a mechanism that relates data in an output to the contributing data in the input. \pause
+  \pause
+
+  In bigger databases, these queries can become very complex.\pause
 
   \bigskip
 
-  It is typically represented as a form of annotation information, usually by tagging data on the tuple-level of a relation.
+  Provenance solves this complexity by tracking the history.\pause
+
+  \bigskip
+
+  We represent it by tagging tuples with annotations.
 \end{frame}
 
 \begin{frame}{What is database provenance?}
   \centering
-  \resizebox{0.95\textwidth}{!}{%
-    \renewcommand{\arraystretch}{1.15}%
-    \setlength{\tabcolsep}{6pt}%
+  \resizebox{\textwidth}{!}{
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{5pt}
     \begin{tabular}{@{}c@{\hspace{1.5cm}}c@{}}
       \begin{tabular}{@{}c@{}}
         \textit{Loans} \\[0.15cm]
-        \begin{tabular}{|c|c|c|c|c|l}
+        \begin{tabular}{|c|c|c|c|c|c}
           \cline{1-5}
           \textbf{Loan\_id} & \textbf{Member\_id} & \textbf{Book\_id} & \textbf{Borrow\_date} & \textbf{Duration} &                     \\ \cline{1-5}
           43666             & 4221                & 389               & 17-02-2026            & 7                 & \uncover<2->{$l_1$} \\ \cline{1-5}
-          43666             & 4221                & 782               & 17-02-2026            & 7                 & \uncover<2->{$l_2$} \\ \cline{1-5}
+          43666             & 4221                & 450               & 17-02-2026            & 7                 & \uncover<2->{$l_2$} \\ \cline{1-5}
           43952             & 4222                & 975               & 17-02-2026            & 30                & \uncover<2->{$l_3$} \\ \cline{1-5}
           54673             & 4223                & 389               & 06-03-2026            & 14                & \uncover<2->{$l_4$} \\ \cline{1-5}
           58930             & 4224                & 975               & 09-03-2026            & 30                & \uncover<2->{$l_5$} \\ \cline{1-5}
@@ -148,11 +200,11 @@
        &
       \begin{tabular}{@{}c@{}}
         \textit{Books}   \\[0.15cm]
-        \begin{tabular}{|c|c|c|c|l}
+        \begin{tabular}{|c|c|c|c|c}
           \cline{1-4}
           \textbf{Book\_id} & \textbf{Book\_title}    & \textbf{Genre} & \textbf{Copies} &                     \\ \cline{1-4}
           389               & Nineteen Eighty-Four    & Fiction        & 5               & \uncover<2->{$b_1$} \\ \cline{1-4}
-          782               & Brave New World         & Fiction        & 4               & \uncover<2->{$b_2$} \\ \cline{1-4}
+          450               & Brave New World         & Fiction        & 4               & \uncover<2->{$b_2$} \\ \cline{1-4}
           879               & Divine Comedy           & Poetry         & 6               & \uncover<2->{$b_3$} \\ \cline{1-4}
           975               & Critique of Pure Reason & Philosophy     & 3               & \uncover<2->{$b_4$} \\ \cline{1-4}
         \end{tabular}
@@ -160,7 +212,7 @@
         \\[1.8cm]
 
         \textit{Members} \\[0.15cm]
-        \begin{tabular}{|c|c|c|l}
+        \begin{tabular}{|c|c|c|c}
           \cline{1-3}
           \textbf{Member\_id} & \textbf{First\_name} & \textbf{Last\_name} &                     \\ \cline{1-3}
           4221                & Aditya               & Prakash             & \uncover<2->{$m_1$} \\ \cline{1-3}
@@ -169,19 +221,151 @@
           4224                & Luigi                & Brunetta            & \uncover<2->{$m_4$} \\ \cline{1-3}
         \end{tabular}
       \end{tabular}
-    \end{tabular}%
+    \end{tabular}
   }
 \end{frame}
 
+\begin{frame}{What is database provenance?}
+  We assume that the annotations belong to a set $S$.\pause
 
-\begin{frame}{What is a semiring?}
+  \bigskip
+
+  We define:\pause
+  \begin{itemize}
+    \item An \emph{$S$-relation} as a function $R : \mathbb{D}^U \to S$ with finite support.\pause
+    \item An \emph{$S$-database} as a finite set of $S$-relations.
+  \end{itemize}
 \end{frame}
 
-\begin{frame}{Semiring framework}
+\begin{frame}{What happens to the annotations?}
+  \pause
+  We need to assume additional structure on $S$.\pause
+
+  \bigskip
+  $\pi_{Book\_title}\Bigl(\sigma_{Duration=7}(Loans \bowtie Books) \cup \sigma_{Duration=14}(Loans \bowtie Books)\Bigr)$\pause
+
+  \bigskip
+  We obtain $(S, +, \cdot, 0, 1)$.
 \end{frame}
 
-\begin{frame}{Extending the semiring framework}
-  Extensive work has been carried out to extend the semiring framework to more expressive
+\begin{frame}[t]{What happens to the annotations?}
+  \centering
+  \[
+    \pi_{Book\_title}\Bigl(\sigma_{Duration=7}(Loans \bowtie Books) \cup \sigma_{Duration=14}(Loans \bowtie Books)\Bigr)
+  \] \pause
+
+  \resizebox{\textwidth}{!}{
+    \renewcommand{\arraystretch}{1.15}
+    \setlength{\tabcolsep}{5pt}
+    \begin{tabular}{@{}c@{\hspace{1.5cm}}c@{}}
+      \begin{tabular}{@{}c@{}}
+        \textit{Loans} \\[0.15cm]
+        \begin{tabular}{|c|c|c|c|c|c}
+          \cline{1-5}
+          \textbf{Loan\_id} & \textbf{Member\_id} & \textbf{Book\_id} & \textbf{Borrow\_date} & \textbf{Duration} &       \\ \cline{1-5}
+          43666             & 4221                & 389               & 17-02-2026            & 7                 & $l_1$ \\ \cline{1-5}
+          43666             & 4221                & 450               & 17-02-2026            & 7                 & $l_2$ \\ \cline{1-5}
+          43952             & 4222                & 975               & 17-02-2026            & 30                & $l_3$ \\ \cline{1-5}
+          54673             & 4223                & 389               & 06-03-2026            & 14                & $l_4$ \\ \cline{1-5}
+          58930             & 4224                & 975               & 09-03-2026            & 30                & $l_5$ \\ \cline{1-5}
+          58930             & 4224                & 879               & 09-03-2026            & 30                & $l_6$ \\ \cline{1-5}
+        \end{tabular}
+      \end{tabular}
+
+       &
+      \begin{tabular}{@{}c@{}}
+        \textit{Books}   \\[0.15cm]
+        \begin{tabular}{|c|c|c|c|c}
+          \cline{1-4}
+          \textbf{Book\_id} & \textbf{Book\_title}    & \textbf{Genre} & \textbf{Copies} &       \\ \cline{1-4}
+          389               & Nineteen Eighty-Four    & Fiction        & 5               & $b_1$ \\ \cline{1-4}
+          450               & Brave New World         & Fiction        & 4               & $b_2$ \\ \cline{1-4}
+          879               & Divine Comedy           & Poetry         & 6               & $b_3$ \\ \cline{1-4}
+          975               & Critique of Pure Reason & Philosophy     & 3               & $b_4$ \\ \cline{1-4}
+        \end{tabular}
+
+        \\[1.8cm]
+
+        \textit{Members} \\[0.15cm]
+        \begin{tabular}{|c|c|c|c}
+          \cline{1-3}
+          \textbf{Member\_id} & \textbf{First\_name} & \textbf{Last\_name} &       \\ \cline{1-3}
+          4221                & Aditya               & Prakash             & $m_1$ \\ \cline{1-3}
+          4222                & Graham               & Leigh               & $m_2$ \\ \cline{1-3}
+          4223                & Ivan                 & Di Liberti          & $m_3$ \\ \cline{1-3}
+          4224                & Luigi                & Brunetta            & $m_4$ \\ \cline{1-3}
+        \end{tabular}
+      \end{tabular}
+    \end{tabular}
+  }
+\end{frame}
+
+\begin{frame}[t]{What happens to the annotations?}
+  \centering
+  \[
+    \pi_{Book\_title}\Bigl(\sigma_{Duration=7}(Loans \bowtie Books) \cup \sigma_{Duration=14}(Loans \bowtie Books)\Bigr)
+  \]
+
+  \[
+    \renewcommand{\arraystretch}{1.2}
+    \begin{array}{|c|c}
+      \cline{1-1}
+      \textbf{Book\_title}        &                                             \\ \cline{1-1}
+      \text{Nineteen Eighty-Four} & \uncover<2->{l_1 \cdot b_1 + l_4 \cdot b_1} \\ \cline{1-1}
+      \text{Brave New World}      & \uncover<2->{l_2 \cdot b_2}                 \\ \cline{1-1}
+    \end{array}
+  \]
+\end{frame}
+
+\begin{frame}[t]{When do semirings come in?}
+  \pause
+  \textit{For all relations $R, S, T$ over attribute set $U$:}\\[0.3cm]
+  \begin{center}
+    \begin{minipage}{8.2cm}
+      \begin{align*}
+        R \cup (S \cup T)       & = (R \cup S) \cup T                \\
+        R \cup S                & = S \cup R                         \\
+        R \cup \mathbf{0}_U     & = R                                \\
+        R \bowtie (S \bowtie T) & = (R \bowtie S) \bowtie T          \\
+        R \bowtie S             & = S \bowtie R                      \\
+        R \bowtie \mathbf{1}    & = R                                \\
+        R \bowtie (S \cup T)    & = (R \bowtie S) \cup (R \bowtie T) \\
+        R \bowtie \mathbf{0}_U  & = \mathbf{0}_U
+      \end{align*}
+    \end{minipage}
+  \end{center}
+\end{frame}
+
+\begin{frame}[t]{What is a (commutative) semiring?}
+  \textit{An algebraic structure $(S, +, \cdot, 0, 1)$ such that for all $a,b,c \in S$:}\\[0.3cm]
+  \begin{center}
+    \begin{minipage}{8.2cm}
+      \begin{align*}
+        a + (b + c)         & = (a + b) + c               \\
+        a + b               & = b + a                     \\
+        a + 0               & = a                         \\
+        a \cdot (b \cdot c) & = (a \cdot b) \cdot c       \\
+        a \cdot b           & = b \cdot a                 \\
+        a \cdot 1           & = a                         \\
+        a \cdot (b + c)     & = (a \cdot b) + (a \cdot c) \\
+        a \cdot 0           & = 0
+      \end{align*}
+    \end{minipage}
+  \end{center}
+  \pause
+  Examples:
+  \begin{itemize}
+    \item $\mathbb{N} = (\{0,1,2,\dots\}, +, \times, 0, 1)$
+    \item $\mathbb{B} = (\{0, 1\}, \lor, \land, \bot, \top)$
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Extending the framework}
+  Further research has focused on extending the framework beyond the positive relational algebra to more expressive queries.\pause
+
+  \bigskip
+
+  We briefly consider one case, aggregation.
 \end{frame}
 
 \begin{frame}{Aggregate queries}
@@ -190,12 +374,10 @@
       \begin{tikzpicture}[
           font=\sffamily\small,
           cell/.style={draw, minimum height=0.6cm, minimum width=1.6cm, anchor=center, inner sep=2pt},
-          header/.style={cell, fill=gray!20, font=\sffamily\bfseries\small},
-          % Row colors
-          adv/.style={fill=red!20},
+          header/.style={fill=gray!20, font=\sffamily\bfseries\small},
+          bio/.style={fill=red!20},
           fan/.style={fill=cyan!15},
-          rom/.style={fill=yellow!30},
-          % Table style
+          poe/.style={fill=yellow!30},
           table/.style={
               matrix of nodes,
               nodes={cell},
@@ -207,64 +389,160 @@
           arrow/.style={-Stealth, thick, rounded corners}
         ]
 
-        % -------- Left Table (Books) --------
-        \matrix [table] (L) {
-        |[header]| title \& |[header]| genre   \& |[header]| qty \\
-        |[adv]| book 1   \& |[adv]| adventure \& |[adv]| 4     \\
-        |[fan]| book 2   \& |[fan]| fantasy   \& |[fan]| 5     \\
-        |[rom]| book 3   \& |[rom]| romance   \& |[rom]| 6     \\
-        |[adv]| book 4   \& |[adv]| adventure \& |[adv]| 3     \\
-        |[fan]| book 5   \& |[fan]| fantasy   \& |[fan]| 1     \\
-        |[rom]| book 6   \& |[rom]| romance   \& |[rom]| 2     \\
+        \useasboundingbox (-3.2, -2.8) rectangle (10.6, 3.6);
+
+        \matrix [table, column 2/.style={nodes={minimum width=2cm}}] (L) {
+        |[header]| title \& |[header]| genre   \& |[header]| price \\
+        |[bio]| Book 1   \& |[bio]| biography \& |[bio]| 40     \\
+        |[fan]| Book 2   \& |[fan]| fantasy   \& |[fan]| 50     \\
+        |[poe]| Book 3   \& |[poe]| poetry   \& |[poe]| 60     \\
+        |[bio]| Book 4   \& |[bio]| biography \& |[bio]| 30     \\
+        |[fan]| Book 5   \& |[fan]| fantasy   \& |[fan]| 10     \\
+        |[poe]| Book 6   \& |[poe]| poetry   \& |[poe]| 20     \\
         };
+        \node[above=0.2cm of L] {\textit{Books}};
 
-        % -------- Right Table (Aggregation result) --------
-        % Reduced horizontal distance from 4cm to 2.5cm to help it fit
-        \matrix [table, right=2.5cm of L] (R) {
-        |[header]| genre   \& |[header]| total \\
-        |[adv]| adventure \& |[adv]| 7     \\
-        |[fan]| fantasy   \& |[fan]| 6    \\
-        |[rom]| romance   \& |[rom]| 8     \\
+        \matrix<2-> [table, right=2.5cm of L, nodes={cell, minimum width=2.5cm}] (R) {
+        |[header]| genre   \& |[header]| AVG(price) \\
+        |[bio]| biography \& |[bio]| 35     \\
+        |[fan]| fantasy   \& |[fan]| 30    \\
+        |[poe]| poetry   \& |[poe]| 40     \\
         };
+        \node<2-> [above=0.2cm of R] {$\gamma_{genre, AVG(price)}(Books)$};
 
-        % -------- Labels --------
-        \node[above=0.2cm of L] {\textbf{Books}};
-        \node[above=0.2cm of R] {\textbf{GROUP BY genre}};
-
-        % -------- Arrows --------
         \begin{scope}
-          % Adventure
-          \draw[arrow, red!70!black] (L-2-3.east) -- (R-2-1.west);
-          \draw[arrow, red!70!black] (L-5-3.east) -- (R-2-1.west);
-
-          % Fantasy
-          \draw[arrow, cyan!70!black] (L-3-3.east) -- (R-3-1.west);
-          \draw[arrow, cyan!70!black] (L-6-3.east) -- (R-3-1.west);
-
-          % Romance
-          \draw[arrow, yellow!80!black] (L-4-3.east) -- (R-4-1.west);
-          \draw[arrow, yellow!80!black] (L-7-3.east) -- (R-4-1.west);
-
-          % Logical operator label
-          \node[draw, dashed, fill=white, font=\scriptsize] at ([xshift=1.25cm]L.east) {SUM(qty)};
+          \draw<2-> [arrow, red!70!black] (L-2-3.east) -- (R-2-1.west);
+          \draw<2-> [arrow, red!70!black] (L-5-3.east) -- (R-2-1.west);
         \end{scope}
 
       \end{tikzpicture}
-    } % End of \resizebox
+    }
   \end{center}
 \end{frame}
 
-\begin{frame}{Aggregation provenance}
+\begin{frame}{Semirings alone are insufficient}
+  \begin{center}
+    \resizebox{0.55\textwidth}{!}{
 
+      \only<1>{
+        \begin{tikzpicture}[
+            font=\sffamily\small,
+            cell/.style={draw, minimum height=0.6cm, minimum width=1.6cm, anchor=center, inner sep=2pt},
+            header/.style={font=\sffamily\bfseries\small},
+            table/.style={
+                matrix of nodes,
+                nodes={cell},
+                column sep=-\pgflinewidth,
+                row sep=-\pgflinewidth,
+                nodes in empty cells,
+                ampersand replacement=\&
+              }
+          ]
+          \matrix [table,
+          column 1/.style={nodes={minimum width=2.0cm}},
+          column 2/.style={nodes={minimum width=2.0cm}},
+          column 3/.style={nodes={minimum width=1.6cm}},
+          column 4/.style={nodes={draw=none, fill=none, minimum width=1.0cm, anchor=west}}
+          ] (T) {
+          |[header]| title \& |[header]| genre \& |[header]| price \& \\
+          Book 1 \& biography \& 40 \& $b_1$ \\
+          Book 2 \& fantasy \& 50 \& $b_2$ \\
+          Book 3 \& poetry \& 60 \& $b_3$ \\
+          Book 4 \& biography \& 30 \& $b_4$ \\
+          Book 5 \& fantasy \& 10 \& $b_5$ \\
+          Book 6 \& poetry \& 20 \& $b_6$ \\
+          };
+        \end{tikzpicture}%
+      }%
+
+      \only<2->{
+        \begin{tikzpicture}[
+            font=\sffamily\small,
+            cell/.style={draw, minimum height=0.6cm, minimum width=1.6cm, anchor=center, inner sep=2pt},
+            header/.style={font=\sffamily\bfseries\small},
+            fan/.style={fill=cyan!15},
+            table/.style={
+                matrix of nodes,
+                nodes={cell},
+                column sep=-\pgflinewidth,
+                row sep=-\pgflinewidth,
+                nodes in empty cells,
+                ampersand replacement=\&
+              }
+          ]
+          \matrix [table,
+          column 1/.style={nodes={minimum width=2.0cm}},
+          column 2/.style={nodes={minimum width=2.0cm}},
+          column 3/.style={nodes={minimum width=1.6cm}},
+          column 4/.style={nodes={draw=none, fill=none, minimum width=1.0cm, anchor=west}}
+          ] (T) {
+          |[header]| title \& |[header]| genre \& |[header]| price \& \\
+          Book 1 \& biography \& 40 \& $b_1$ \\
+          |[fan]| Book 2 \& |[fan]| fantasy \& |[fan]| 50 \& $b_2$ \\
+          Book 3 \& poetry \& 60 \& $b_3$ \\
+          Book 4 \& biography \& 30 \& $b_4$ \\
+          |[fan]| Book 5 \& |[fan]| fantasy \& |[fan]| 10 \& $b_5$ \\
+          Book 6 \& poetry \& 20 \& $b_6$ \\
+          };
+        \end{tikzpicture}%
+      }%
+
+    }
+  \end{center}
+\end{frame}
+
+\begin{frame}{Semimodules to the rescue}
+  We need an operation where the values are scaled by the annotations.\pause
+
+  That is exactly what scalar multiplication does: $\ast : S \times M \to M$.\pause
+
+  \bigskip
+
+  Let $S$ be a commutative semiring. An \emph{$S$-semimodule} $(M, +_M, 0_M, \ast)$ is a commutative monoid $(M, +_M, 0_M)$ such that for all $r, s \in S$ and $m, n \in M$:
+  \[
+    \begin{aligned}
+      r \ast (m +_M n)       & = r \ast m +_M r \ast n           \\
+      (r +_S s) \ast m       & = r \ast m +_M s \ast m           \\
+      (r \cdot_S s) \ast m   & = r \ast (s \ast m)               \\
+      1_S \ast m             & = m                               \\
+      0_S \ast m = 0_M \quad & \text{and} \quad r \ast 0_M = 0_M
+    \end{aligned}
+  \]
 \end{frame}
 
 \begin{frame}{Open challenges}
   \pause
   \begin{itemize}
-    \item Unified framework for recursion, aggregates, and difference \pause
-    \item Trade-offs between generality and usability \pause
+    \item Unified framework for aggregation, recursion, and difference \pause
+    \item Trade-offs between generality and practicality \pause
     \item Limits of semiring-based provenance
   \end{itemize}
+\end{frame}
+
+\begin{frame}{Contributions}
+  \pause
+  \begin{itemize}
+    \item A structured accessible narrative \pause
+    \item Proofs for propositions/theorems \pause
+    \item Reformulated concepts for clarity
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Fundamental theorem}
+  Let $h$ be a semiring homomorphism. Then, for any $\mathcal{S}$-relational algebra query $Q$:
+  \begin{center}
+    \begin{tikzpicture}[>=stealth, thick]
+      \node (Sdb)    at (0,2)   {$\mathcal{S}_{db}$};
+      \node (Sdbp)   at (4,2)   {$\mathcal{S}'_{db}$};
+      \node (Srel)   at (0,0)   {$\mathcal{S}_{rel}$};
+      \node (Srelp)  at (4,0)   {$\mathcal{S}'_{rel}$};
+
+      \draw[->] (Sdb)  -- node[above] {$h_{Rel}$} (Sdbp);
+      \draw[->] (Sdb)  -- node[right]  {$Q$} (Srel);
+      \draw[->] (Sdbp) -- node[right] {$Q$} (Srelp);
+      \draw[->] (Srel) -- node[above] {$h_{Rel}$} (Srelp);
+    \end{tikzpicture}
+  \end{center}
 \end{frame}
 
 \end{document}
