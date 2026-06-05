@@ -1339,7 +1339,7 @@ We have thus far considered aggregation in a limited context: when it is the las
 
 \section{Arbitrary aggregation}
 
-Arbitrary aggregation with grouping becomes challenging when the results may be fed into subsequent query operations, such as joins or selections. In this setting, the truth values of comparisons over such expressions are not determined a priori. To represent the outcomes of such operations, the symbolic expressions in $S \otimes M$ are extended with equality comparisons.
+Aggregation with grouping becomes challenging when the results may be fed into subsequent query operations, such as joins or selections. In this setting, the truth values of comparisons over such expressions are not determined a priori. To represent the outcomes of such operations, the symbolic expressions in $S \otimes M$ are extended with equality comparisons.
 
 More specifically, we introduce to the semiring $S$ new expressions of the form $[x = y]$ where $x,y \in S \otimes M$. If we need to compare an aggregate result with an $m \in M$, we use $\iota(m)$ instead. Intuitively, these expressions act as placeholders for the truth value of a comparison.
 
