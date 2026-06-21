@@ -37,9 +37,21 @@
 \newtheorem{prop}[thm]{Proposition}
 
 \theoremstyle{definition}
-\newtheorem{defn}[thm]{Definition}
-\newtheorem{exmpl}[thm]{Example}
 \newtheorem{query}[thm]{Query}
+
+\declaretheorem[
+  style=definition,
+  name=Definition,
+  sibling=thm,
+  qed=$\triangledown$
+]{defn}
+
+\declaretheorem[
+  style=definition,
+  name=Example,
+  sibling=thm,
+  qed=$\triangledown$
+]{exmpl}
 
 \theoremstyle{remark}
 \newtheorem*{remark}{Remark}
@@ -92,7 +104,7 @@
     \vspace{2cm}
 
     {\normalsize
-        \Large Supervisors: \emph{Ivan Di Liberti} \& \emph{Phokion Kolaitis}\footnote{Computer Science and Engineering Department, University of California, Santa Cruz} \par
+        \Large{Supervisors:} \emph{\Large{Ivan Di Liberti}} \normalsize{(University of Gothenburg)} \& \par \emph{\Large{Phokion Kolaitis}} \normalsize{(UC Santa Cruz)} \par
     }
 
     \vspace{2cm}
@@ -191,11 +203,11 @@ While the paper by Green et al. was influential, it focused on the positive frag
 
 A significant body of further research has gone into extending the semiring framework to support more expressive queries. In what follows, we examine the results of the paper by Green et al. as well as subsequent extensions of the framework.
 
-More specifically, \autoref{chapter:background} provides relevant background knowledge on database theory and abstract algebra. \autoref{chapter:semirings} then presents the semiring-based framework for provenance. We show how the notions of relation, database, and the relational algebra are generalised to accommodate annotations. Furthermore, we confirm that in order for standard relational algebra identities to continue to hold in this generalisation, the underlying structure of the annotations must be a commutative semiring. We present the fundamental theorem, stating that query evaluation commutes with semiring homomorphisms. We then end the chapter by showing that the polynomial semiring serves as the provenance domain and provide examples of notable semirings it generalises.
+More specifically, \autoref{chapter:background} provides relevant background knowledge on database theory and abstract algebra. \autoref{chapter:semirings} then presents the semiring-based framework for provenance. We show how the notions of relation, database, and the relational algebra are generalised to accommodate annotations. Furthermore, we confirm that in order for standard relational algebra identities to continue to hold in this generalisation, the underlying structure of the annotations must be a commutative semiring. We present the fundamental theorem of the framework, stating that query evaluation commutes with semiring homomorphisms. We then end the chapter by showing that the polynomial semiring serves as the provenance domain and provide examples of notable semirings it generalises.
 
 In \autoref{chapter:aggregation}, we investigate an extension of the semiring framework that facilitates the expression of aggregate queries. We show that semirings alone are insufficient for a uniform treatment of aggregation and consider the necessary algebraic modifications. We utilise the additional structure provided by semimodules and employ a tensor product construction as the provenance domain. We then define the operations of aggregation and grouping on this extended structure and conclude the chapter by demonstrating that the fundamental theorem continues to hold.
 
-\autoref{chapter:difference} provides a short survey of the various approaches used to define a difference operation in the semiring framework. Given that semirings lack additive inverses by definition, this presents a significant challenge. We classify these approaches into three main groups: the direct addition of algebraic identities to semirings, the use of a semiring's natural order to define a monus operator, and the construction of quotient semirings, ultimately evaluating the various trade-offs that each approach entails.
+\autoref{chapter:difference} provides a short survey of the various approaches used to define a difference operation in the semiring framework. Given that semirings lack additive inverses by definition, this presents a significant challenge. We classify these approaches into three main groups: the direct addition of algebraic identities to semirings, the use of a semiring's natural order to define a monus operation, and the construction of quotient semirings, ultimately evaluating the various trade-offs that each approach entails.
 
 Finally, \autoref{chapter:conclusion} reviews topics not covered and discusses research challenges.
 
@@ -223,7 +235,7 @@ In this chapter, we review the theoretical background required for understanding
 
 Although several database models exist, relational databases remain the most widely used and studied. The relational data model was introduced and popularised by Edgar Codd through a series of influential papers published in the early 1970s \cite{Codd1970, Codd1971, Codd1972}. Henceforth, we use the term database to mean a relational database. A database consists of finitely many relations (tables). Each relation has a finite number of attributes (columns) and tuples (rows).
 
-More formally, we fix a countably infinite set of constants (values) $\mathbb{D}$, called the underlying \emph{domain}. We also assume that a totally ordered countably infinite set $\mathcal{U}$ of \emph{attribute names} is fixed. We use the symbols $U,V$ for finite subsets of $\mathcal{U}$. We define a \emph{tuple} as a function $t : U \to \mathbb{D}$.
+More formally, we fix a countably infinite set of constants (values) $\mathbb{D}$, called the underlying \emph{domain}. We also assume that a totally ordered countably infinite set $\mathcal{U}$ of \emph{attribute names} is fixed. We use the symbols $U,V$ for finite subsets of $\mathcal{U}$. We define a \emph{tuple} as a function $t : U \to \mathbb{D}$, in which case we say that $t$ is over the attribute set $U$.
 
 It is sometimes helpful to instead view a tuple as an ordered $n$-tuple of constants, i.e. an element of the Cartesian product $\mathbb{D}^n$, where $n = |U|$. These two viewpoints are referred to as the \emph{named} and \emph{unnamed} perspectives, respectively.
 
@@ -255,14 +267,18 @@ As hinted above, relational algebra defines operations that transform one or mor
     \begin{itemize}
         \item Selection, $\sigma_\theta(R)$: Given an equality $\theta$ of the form $A=B$ or $A=a$ (where $A, B \in U$ and $a \in \mathbb{D}$), selection is defined as:
               \[
-                  \sigma_\theta(R) = \{ t \in R \mid t(A) = t(B) \text{ or } t(A) = a \},
+                  \sigma_\theta(R) =
+                  \begin{cases}
+                      \{ t \in R \mid t(A) = t(B) \} & \text{if } \theta \text{ is of the form } A=B, \\
+                      \{ t \in R \mid t(A) = a \}    & \text{otherwise.}
+                  \end{cases}
               \]
-              where $t(A)$ denotes the value of the function $t$ at attribute $A$.
+              where $t(A)$ denotes the value of the tuple $t$ at attribute $A$.
         \item Projection, $\pi_L(R)$: Given a set of attributes $L \subseteq U$, projection is defined as:
               \[
                   \pi_L(R) = \{ t[L] \mid t \in R \},
               \]
-              where $t[L]$ denotes the function $t$ restricted to the attribute set $L$.
+              where $t[L]$ denotes the tuple $t$ restricted to the attribute set $L$.
         \item (Natural) join, $R \bowtie S$: Join combines tuples from $R$ and $S$ using any shared attributes:
               \[
                   R \bowtie S = \{ t \text{ over } U \cup V \mid t[U] \in R \text{ and } t[V] \in S \}.
@@ -278,7 +294,11 @@ As hinted above, relational algebra defines operations that transform one or mor
     \begin{itemize}
         \item Selection, $\sigma_\theta(R)$: Given an equality $\theta$ of the form $i = j$ or $i = a$ (where $1 \le i, j \le n$ and $a \in \mathbb{D}$), selection is defined as:
               \[
-                  \sigma_\theta(R) = \{ (a_1, \dots, a_n) \in R \mid a_i = a_j \text{ or } a_i = a \}.
+                  \sigma_\theta(R) =
+                  \begin{cases}
+                      \{ (a_1, \dots, a_n) \in R \mid a_i = a_j \} & \text{if } \theta \text{ is of the form } i=j, \\
+                      \{ (a_1, \dots, a_n) \in R \mid a_i = a \}   & \text{otherwise.}
+                  \end{cases}
               \]
         \item Projection, $\pi_L(R)$: Given a sequence of indices $L = (i_1, i_2, \dots, i_k)$ where each $i_j \in \{1, \dots, n\}$, projection is defined as:
               \[ \
@@ -331,10 +351,10 @@ We are now ready to define the relational algebra and the relational calculus. T
 
 Extending UCQs with negation is not as straightforward as it is for the relational algebra. Just as with extending conjunctive queries with union, care must be taken to ensure that the resulting calculus remains well-defined since unrestricted negation can lead to infinite results.
 
-The most popular, as well as the most intuitive, approach for extending unions of conjunctive queries to the relational calculus is the active domain semantics, in which variables are restricted to range over the set of all values appearing in the query or the database.
+The most popular, as well as the most intuitive, approach for extending unions of conjunctive queries to the relational calculus is the active domain semantics, in which all variables are restricted to range over the set of all values appearing in the database.
 
 \begin{defn}[Active domain]
-    The \emph{active domain} of a database $D$ is the set of all constants that occur in the relations of $D$, denoted by $adom(D)$. Similarly, the active domain of a query $Q$ is the set of all constants that occur in $Q$, denoted by $adom(Q)$. We denote by $adom(D, Q)$ the union of the active domain of database $D$ with the active domain of query $Q$. The \emph{active domain semantics} of a first-order formula is defined such that all variables range over $\text{adom}(D, Q)$.
+    The \emph{active domain} of a database $D$ is the set of all constants that occur in the relations of $D$, denoted by $adom(D)$. The \emph{active domain semantics} of a first-order formula is defined such that all variables are restricted to range over $adom(D)$.
 \end{defn}
 
 The \emph{relational calculus} is then defined as the set of all queries expressible in first-order logic over a relational vocabulary, evaluated under active domain semantics.
@@ -356,7 +376,6 @@ A Datalog program is a finite set of rules and facts. Rules are in the form of a
         \end{aligned}
     \]
     Intuitively, the first rule is the base case: there is a path from $x$ to $y$ whenever there is a direct edge from $x$ to $y$. The second rule is the recursive case: there is a path from $x$ to $y$ if $x$ has an edge to some $z$ and there is already a path from $z$ to $y$.
-
 \end{exmpl}
 
 \begin{defn}[Datalog program]
@@ -432,7 +451,7 @@ We now review polynomial semirings, which will play a leading role in our develo
     \[
         \sum_{m \in \mathcal{M}} s_m m,
     \]
-    where $\mathcal{M}$ is the set of all possible monomials (finite products of variables) in $X$, and the coefficient $s_m$ is in $S$. Furthermore, we require the set $\{ m \in \mathcal{M} \mid s_m \neq 0 \}$ to be finite. Such sums are usually written as finite expressions by omitting terms with zero coefficients.
+    where $\mathcal{M}$ is the set of monomials (finite products of variables) in $X$, and the coefficient $s_m$ is in $S$. We require the set $\{ m \in \mathcal{M} \mid s_m \neq 0 \}$ to be finite, meaning that each element of $S[X]$ can be uniquely represented as a finite sum by omitting terms with zero coefficients.
 
     Addition in $S[X]$ is defined by combining equal monomials and adding their coefficients in $S$, and multiplication is defined by distributivity, where the product of two coefficients is taken in $S$ and the product of two monomials is found by adding the exponents of their corresponding variables.
 \end{defn}
@@ -566,7 +585,7 @@ A powerful technique for constructing new algebraic structures from existing one
 When an equivalence relation is a congruence, we can naturally define a semiring structure on the set of the equivalence classes.
 
 \begin{defn}[Quotient semiring]
-    Given a semiring $S$ and a congruence relation $\sim$, the \emph{quotient semiring} $S/\sim$ is the set of equivalence classes $[s] = \{ t \in S \mid s \sim t \}$, equipped with the operations:
+    Given a semiring $S$ and a congruence relation $\sim$, the \emph{quotient semiring} $S/\!\!\sim$ is the set of equivalence classes $[s] = \{ t \in S \mid s \sim t \}$, equipped with the operations:
     \[
         [s] + [t] = [s + t] \quad \text{and} \quad [s] \cdot [t] = [s \cdot t].
     \]
@@ -584,22 +603,24 @@ For the algebraic background used in this section, the reader is referred to two
 \chapter{Semirings for provenance}
 \label{chapter:semirings}
 
-In this chapter, we present the semiring-based framework for provenance, which forms the core of this work. We first formalise the notion of annotated relations and present a generalisation of the positive relational algebra to this annotated setting, establishing its key algebraic properties. We then focus on the polynomial semiring, and show how it serves as a universal representation from which a wide range of semantics can be obtained.
+In this chapter, we present the semiring-based framework for provenance, which forms the core of this work. We first formalise the notion of annotated relations and present a generalisation of the positive relational algebra to this annotated setting.
+
+We then establish two important properties: that the annotation structure that emerges from the requirement to preserve fundamental relational algebra identities is that of a commutative semiring; and that query evaluation commutes with semiring homomorphisms.
+
+Finally, we focus on the polynomial semiring, showing how it serves as the provenance domain from which a wide range of semantics can be obtained.
 
 \section{Semiring-annotated relations}
 
 In databases, provenance is commonly modelled by annotating relations with additional information, typically at the tuple level. This idea is neither novel nor exclusive to provenance: as early as 1984, Imieliński and Lipski \cite{Imielinski1984} generalised the relational algebra to handle incomplete information by allowing tuples to carry Boolean formulae as annotations. Other familiar semantics can be viewed in the same light: under standard set semantics (where duplicates are ignored), tuples are annotated with truth values indicating presence or absence; under bag semantics (where duplicates are allowed), tuples are annotated with natural numbers recording multiplicities; and in probabilistic databases, tuples carry annotations from the interval $[0,1]$ representing confidence scores.
 
-To provide a uniform framework for annotated relations, Green et al. \cite{Green2007} generalised the positive relational algebra to work over relations annotated with elements of an abstract structure $\mathcal{S}$. As we shall see, the algebraic structure that emerges from the requirement to preserve fundamental relational algebra identities is that of a commutative semiring.
-
 In \autoref{chapter:background}, a tuple was defined as a function from a finite set of attribute names to the underlying domain, $t : U \to \mathbb{D}$, and a relation as a finite set of tuples.
 
-We now generalise this notion by allowing tuples to carry annotations. We accomplish this by associating each $U$-tuple with an element drawn from a set of annotations $S$.
+We generalise this notion by allowing tuples to carry annotations. We accomplish this by associating each $U$-tuple with an element drawn from a set of annotations $S$.
 
-To enable algebraic manipulation of these annotations, we assume that $S$ is equipped with additional structure. As discussed in the introduction, data can be combined in two fundamental ways: alternatively and jointly. To capture these modes of combination, we assume the existence of two abstract operations $(+, \cdot)$ on $S$. We further assume that $S$ contains two distinguished elements, $0$ and $1$, representing absence and presence, respectively. Collectively, these assumptions define the algebraic structure $\mathcal{S} = (S,+,\cdot,0,1)$.
+To enable algebraic manipulation of these annotations, we assume that $S$ is equipped with additional structure. As discussed in the introduction, data can be combined in two fundamental ways: alternatively and jointly. To capture these modes of combination, we assume the existence of two abstract operations $(+, \cdot)$ on $S$. We further assume that $S$ contains two distinguished elements, $0$ and $1$, representing absence and presence, respectively. Collectively, these assumptions define the algebraic structure $\mathcal{S} = (S,+,\cdot,0,1)$.\footnote{Much of the early literature uses $K$ instead of $S$.}
 
 \begin{defn}[$\mathcal{S}$-relation]
-    Let $\mathcal{S}$ be the algebraic structure $(S,+,\cdot,0,1)$ and let $\mathbb{D}^U$ denote the set of all $U$-tuples. An \emph{$\mathcal{S}$-relation} is a function $R : \mathbb{D}^U \to S$ with finite support. The support of $R$ is $supp(R) := \{ t \in \mathbb{D}^U \mid R(t) \neq 0 \}$, i.e. the set of tuples that do not map to $0$. An \emph{$\mathcal{S}$-database} is a finite set of $\mathcal{S}$-relations.\footnote{Much of the early literature uses $K$ instead.}
+    Let $\mathcal{S}$ be the algebraic structure $(S,+,\cdot,0,1)$ and let $\mathbb{D}^U$ denote the set of all $U$-tuples. An \emph{$\mathcal{S}$-relation} is a function $R : \mathbb{D}^U \to S$ with finite support. The support of $R$ is $supp(R) := \{ t \in \mathbb{D}^U \mid R(t) \neq 0 \}$, i.e. the set of tuples that do not map to $0$. An \emph{$\mathcal{S}$-database} is a finite set of $\mathcal{S}$-relations.
 \end{defn}
 
 Building on these assumptions, Green et al. \cite{Green2007} generalised the operations of the positive relational algebra to relations annotated with elements of such an annotation set.
@@ -685,14 +706,13 @@ Many of the standard identities of relational algebra are preserved in the $\mat
 
 \begin{prop}
     \label{prop:identitiesifcommsemiring}
-    The following identities:
+    The following identities hold for the $\mathcal{S}$-relational algebra if and only if $\mathcal{S}$ is a commutative semiring:
     \begin{itemize}
         \item Union is associative, commutative, and has identity $\mathbf{0}_U : \mathbb{D}^U \to S$ defined by $\mathbf{0}_U(t) = 0$.
         \item Join is associative, commutative, and has identity $\mathbf{1} : \mathbb{D}^\emptyset \to S$ defined by $\mathbf{1}(\langle \rangle) = 1$.
         \item Join distributes over union.
         \item $\mathbf{0}_U$ is a zero for join.
     \end{itemize}
-    hold for the $\mathcal{S}$-relational algebra if and only if $\mathcal{S}$ is a commutative semiring.
 \end{prop}
 \begin{proof}
     \textbf{($\Rightarrow$)}
@@ -718,7 +738,11 @@ Many of the standard identities of relational algebra are preserved in the $\mat
     Finally, distributivity and the zero property. For any $t \in \mathbb{D}^{U \cup V}$, the annotation of $(R \bowtie (Q_1 \cup Q_2))(t)$ is $R(t[U]) \cdot (Q_1(t[V]) + Q_2(t[V]))$. By applying the distributive law of the semiring, this expression expands to $R(t[U]) \cdot Q_1(t[V]) + R(t[U]) \cdot Q_2(t[V])$, which is the definition of $(R \bowtie Q_1)(t) + (R \bowtie Q_2)(t)$. Lastly, $R \bowtie \mathbf{0}_U = \mathbf{0}_U$ holds because for any $t \in \mathbb{D}^U$, the join definition yields $(R \bowtie \mathbf{0}_U)(t) = R(t) \cdot \mathbf{0}_U(t) = R(t) \cdot 0$. This evaluates to $0$ by the zero property of the semiring, matching $\mathbf{0}_U(t)$.
 \end{proof}
 
-A central result is the fundamental theorem, which states that $\mathcal{S}$-relational algebra query evaluation commutes with semiring homomorphisms. Intuitively, it shows that the $\mathcal{S}$-relational algebra operations are independent of the underlying semiring. This result guarantees that we can first compute a query's provenance in a general semiring and then specialise it to any concrete semiring without changing the result, allowing us to reason consistently about provenance across different semirings.
+A natural question arises regarding the choice of these specific identities, given that relational algebra admits a much larger set of algebraic equivalences. The justification for this is twofold \cite{Amsterdamer2011a}.
+
+First, this particular subset of identities constitutes the core algebraic properties shared by both set and bag semantics. While certain identities, such as the idempotence of union, hold under set semantics but fail under bag semantics, the identities selected here represent the common denominator of both settings. Second, a majority of other valid equivalences in the positive relational algebra can be derived as direct consequences of these identities.
+
+A central result is the fundamental theorem of the $\mathcal{S}$-relational algebra, which states that query evaluation commutes with semiring homomorphisms. Intuitively, it shows that the $\mathcal{S}$-relational algebra operations are independent of the underlying semiring. This result guarantees that we can first compute a query's provenance in a general semiring and then specialise it to any concrete semiring without changing the result, allowing us to reason consistently about provenance across different semirings.
 
 \begin{remark}
     Any semiring homomorphism $h: \mathcal{S} \to \mathcal{S}'$ can be lifted to a map $h_{Rel}$ on $\mathcal{S}$-relations, and by extension on $\mathcal{S}$-databases, by applying $h$ to each tuple annotation.
@@ -799,7 +823,7 @@ The fundamental theorem can also be expressed diagrammatically \cite{Green2017}.
         \draw[->] (Sdbp) -- node[right] {\Large $Q$} (Srelp);
         \draw[->] (Srel) -- node[above] {\Large $h_{Rel}$} (Srelp);
     \end{tikzpicture}
-    \caption{Fundamental theorem}
+    \caption{Fundamental theorem of the $\mathcal{S}$-relational algebra}
     \label{fig:fundamentaltheorem}
 \end{figure}
 
@@ -837,23 +861,17 @@ In each of these cases, the operations of the $\mathcal{S}$-relational algebra r
 
 \begin{exmpl}
     Some interesting semirings include \cite{Green2017}:
-
     \begin{itemize}
         \item The Boolean semiring $\mathbb{B} = (\{0,1\}, \lor, \land, 0, 1)$: Recovers standard set semantics. The elements $0$ and $1$ represent absence and presence, while addition ($\lor$) and multiplication ($\land$) represent disjunction and conjunction.
-
         \item The natural numbers semiring $\mathbb{N} = (\mathbb{N}, +, \cdot, 0, 1)$: Models bag semantics. Tuple annotations represent multiplicities, with union summing ($+$) and join multiplying ($\cdot$) these values.
-
         \item The tropical semiring $\mathbb{T} = (\mathbb{R}_+ \cup \{\infty\}, \min, +, \infty, 0)$: Used for cost and shortest-path calculations. Addition ($\min$) selects the cheapest alternative path, while multiplication ($+$) accumulates costs along a path.
-
-        \item The Viterbi semiring $\mathbb{V} = ([0,1], \max, \cdot, 0, 1)$: Models confidence scores and probabilities. Addition ($\max$) finds the most likely outcome, while multiplication ($\cdot$) combines independent probabilities. It is isomorphic to $\mathbb{T}$ via the mapping $x \mapsto -\ln x$. In practice, it is used in hidden Markov models and trust propagation.
-
+        \item The Viterbi semiring $\mathbb{V} = ([0,1], \max, \cdot, 0, 1)$: Models confidence scores and probabilities. Addition ($\max$) finds the most likely outcome, while multiplication ($\cdot$) combines independent probabilities. It is isomorphic to $\mathbb{T}$ via the mapping $x \mapsto -\ln x$. In practice, it is used in hidden Markov models \cite{Rabiner1989}.
         \item The access control semiring $\mathbb{A} = (\{1 < C < S < T < 0\}, \min, \max, 0, 1)$: Models security clearance levels, ranging from public ($1$) to private ($0$). Addition ($\min$) returns the least restrictive clearance needed across alternative paths, while multiplication ($\max$) computes the highest clearance required to join data.
-
         \item The fuzzy semiring $\mathbb{F} = ([0,1], \max, \min, 0, 1)$: Used for uncertainty propagation and fuzzy queries. Addition ($\max$) selects the most confident value among alternatives, while multiplication ($\min$) represents the conjunction of evidence when combining joint constraints.
     \end{itemize}
 \end{exmpl}
 
-Beyond the concrete semirings discussed above, the provenance semiring provides a unifying framework for capturing multiple provenance models, generalising each of them. These models form a hierarchy that ranges from the most informative to the least. We illustrate with a diagram (borrowed from \cite{Green2017}) which summarises results from Green's work in \cite{Green2011a}.
+Beyond the concrete semirings discussed above, the provenance semiring provides a unifying framework for capturing multiple provenance models, generalising each of them. These models form a hierarchy that ranges from the most informative to the least. We illustrate with a diagram which summarises results from Green's work in \cite{Green2011a}.
 
 \begin{figure}[htbp]
     \centering
@@ -901,7 +919,7 @@ Beyond the concrete semirings discussed above, the provenance semiring provides 
             \draw[dashed, ->] (more) -- (less);
         \end{scope}
     \end{tikzpicture}
-    \caption{Provenance hierarchy}
+    \caption{Semiring provenance hierarchy \cite{Green2017}}
     \label{fig:provenancehierarchy}
 \end{figure}
 
@@ -921,7 +939,7 @@ More specifically, these provenance models are:
 \end{itemize}
 
 \begin{exmpl}
-    As a further illustration of the informativeness of the different provenance models, consider the example relation in \autoref{fig:sourceR}.\footnote{Rather than using contrived names for the attributes, we omit them altogether.}
+    As a further illustration of the informativeness of the different provenance models, consider the example $\mathcal{S}$-relation $R$ in \autoref{fig:exampleR}.\footnote{Rather than using contrived names for the attributes, we omit them altogether.}
 
     Furthermore, consider the following Datalog program:
     \begin{query}
@@ -947,31 +965,31 @@ More specifically, these provenance models are:
                 $d$ & $b$ & $e$ & $\mathbf{r}$ \\
                 $f$ & $g$ & $e$ & $\mathbf{s}$ \\ \cline{1-3}
             \end{tabular}
-            \caption{Source relation $R$}
-            \label{fig:sourceR}
+            \caption{Example $\mathcal{S}$-relation $R$}
+            \label{fig:exampleR}
         \end{subfigure}
         \vspace{1em}
         \begin{subfigure}[t]{\textwidth}
             \centering
             \begin{tabular}{cc|c|c|c|c|c|c}
-                  &   & Lin($X$)  & PosBool($X$) & Why($X$)            & Trio($X$) & $\mathbb{B}[X]$ & $\mathbb{N}[X]$ \\
+                  &   & $\mathbb{N}[X]$ & $\mathbb{B}[X]$ & Trio($X$) & Why($X$)            & PosBool($X$) & Lin($X$)  \\
                 \hline
-                a & c & $\{p\}$   & $p$          & $\{\{p\}\}$         & $2p$      & $p^{2}$         & $2p^{2}$        \\
+                a & c & $2p^{2}$        & $p^{2}$         & $2p$      & $\{\{p\}\}$         & $p$          & $\{p\}$   \\
 
-                a & e & $\{p,r\}$ & $p \wedge r$ & $\{\{p,r\}\}$       & $pr$      & $pr$            & $pr$            \\
+                a & e & $pr$            & $pr$            & $pr$      & $\{\{p,r\}\}$       & $p \land r$  & $\{p,r\}$ \\
 
-                d & c & $\{p,r\}$ & $p \wedge r$ & $\{\{p,r\}\}$       & $pr$      & $pr$            & $pr$            \\
+                d & c & $pr$            & $pr$            & $pr$      & $\{\{p,r\}\}$       & $p \land r$  & $\{p,r\}$ \\
 
-                d & e & $\{r,s\}$ & $r$          & $\{\{r\},\{r,s\}\}$ & $2r + rs$ & $r^{2} + rs$    & $2r^{2} + rs$   \\
+                d & e & $2r^{2} + rs$   & $r^{2} + rs$    & $2r + rs$ & $\{\{r\},\{r,s\}\}$ & $r$          & $\{r,s\}$ \\
 
-                f & e & $\{r,s\}$ & $s$          & $\{\{s\},\{r,s\}\}$ & $2s + rs$ & $s^{2} + rs$    & $2s^{2} + rs$
+                f & e & $2s^{2} + rs$   & $s^{2} + rs$    & $2s + rs$ & $\{\{s\},\{r,s\}\}$ & $s$          & $\{r,s\}$
             \end{tabular}
             \caption{Provenance annotations for \autoref{query:Q}}
             \label{fig:provQ}
         \end{subfigure}
 
-        \caption{Source relation and provenance annotations}
-        \label{fig:source_and_provenance}
+        \caption{Query evaluation under different provenance models}
+        \label{fig:example_and_provenance}
     \end{figure}
 
 \end{exmpl}
@@ -1025,13 +1043,13 @@ The following example illustrates this point.
     Note that the two identical salary values in the Maths department both contribute to the sum. Under set semantics, where duplicates are ignored, this result could not be obtained.
 \end{exmpl}
 
-When extending the semiring framework to support aggregation, it is necessary to articulate the desiderata that such an extension should satisfy. We require that the extension remains compatible with both set and bag semantics, that the fundamental theorem continues to hold, and that the size of the query result should be at most polynomial relative to the size of the input database.
+When extending the semiring framework to support aggregation, it is necessary to articulate the desiderata that such an extension should satisfy. As a baseline, we require that the extension remain compatible with both set and bag semantics and that the fundamental theorem continues to hold.
 
 As we shall see, the semiring structure on tuple annotations alone is insufficient to meet these requirements. Aggregation combines data values with annotations, and this interaction cannot be captured within the semiring framework without assuming additional structure.
 
 To address this, we require a suitable notion of how annotations act on values. Amsterdamer, Deutch, and Tannen \cite{Amsterdamer2011b} propose an approach that satisfies these desiderata by allowing annotations to act on the data values being aggregated, rather than merely annotating the tuples themselves. This leads to a semimodule structure where the annotation semiring acts on the domain of aggregate values, providing a uniform framework for aggregating annotated data. This framework will be the main focus of this chapter.
 
-Intuition into this representation can be gained by considering the case of bag semantics. Let us revisit the \textit{Orders} relation from \autoref{fig:ordersandcustomers}, which has been reproduced below. Suppose we perform a SUM-aggregation on the price attribute, grouping by cust\_id. For the group with cust\_id $\texttt{hcbja}$, the aggregated value is computed as $o_3 \cdot 20 + o_4 \cdot 20$, where $o_3$ and $o_4$ denote the annotations (multiplicities) of the corresponding tuples.
+This representation is motivated by considering how aggregation behaves under bag semantics. Let us revisit the \textit{Orders} relation from \autoref{fig:ordersandcustomers}, which has been reproduced below. Suppose we perform a SUM-aggregation on the price attribute, grouping by cust\_id. For the group with cust\_id $\texttt{hcbja}$, the aggregated value is computed as $o_3 \cdot 20 + o_4 \cdot 20$, where $o_3$ and $o_4$ are the multiplicities of the corresponding tuples, scaling the data values.
 
 \begin{figure}[htbp]
     \centering
@@ -1047,9 +1065,9 @@ Intuition into this representation can be gained by considering the case of bag 
 
 If, for example, $o_3 = 1$ and $o_4 = 2$, then the aggregate evaluates to $1 \cdot 20 + 2 \cdot 20 = 60$, as expected under bag semantics. However, if the input relation is annotated with polynomials rather than multiplicities, the aggregated result is no longer a concrete number, but an expression whose value depends on the interpretation of the provenance annotations.
 
-Amsterdamer et al. address this issue by introducing symbolic expressions that record how the result of an aggregation function is constructed. Rather than directly multiplying a tuple annotation with an attribute value, they form formal expressions by pairing each value with the annotation of the tuple to which it belongs. For instance, $o_3 \cdot 20$ is replaced by the formal expression $o_3 \otimes 20$, and the aggregate value becomes $o_3 \otimes 20 + o_4 \otimes 20$, where $\otimes$ denotes a formal operation that combines annotations with data values.
+Amsterdamer et al. address this challenge by introducing symbolic expressions that record how the result of an aggregation function is constructed. Rather than directly multiplying a tuple annotation with an attribute value, they form formal expressions by pairing each value with the annotation of the tuple to which it belongs. For instance, $o_3 \cdot 20$ is replaced by the formal expression $o_3 \otimes 20$, and the aggregate value becomes $o_3 \otimes 20 + o_4 \otimes 20$, where $\otimes$ denotes a formal operation that combines annotations with data values.
 
-These expressions live in a tensor product domain where the data values are embedded into a semimodule over the annotation semiring. This enriched value domain makes it possible to uniformly represent aggregate values and their provenance.
+These expressions live in a tensor product domain where the data values are embedded into a semimodule over the annotation semiring. The choice of a tensor product construction is motivated by a universal property (which we formally enunciate in the next section): it represents the most general semimodule that can be constructed from the semiring $S$ and the domain of aggregate values.
 
 Before introducing this construction in detail, however, we first demonstrate that extending the semiring framework with aggregation breaks the fundamental theorem. This motivates the need for the additional algebraic structure provided by semimodules and the tensor product construction.
 
@@ -1072,7 +1090,7 @@ Before introducing this construction in detail, however, we first demonstrate th
 
     Let $D$ be an $\mathbb{N}[a,b]$-database containing a single-attribute $\mathbb{N}[a,b]$-relation $R$. Let $t_1=(2)$ and $t_2=(3)$ be the tuples in the support of $R$, and let $R(t_1)=a$ and $R(t_2)=b$.
 
-    Since $Q$ returns an $\mathcal{S}$-relation, its output must consist of data values in $\mathbb{D}$. Hence, the query result must choose some concrete value in the data domain separate from the annotation domain.
+    Since $Q$ returns an $\mathcal{S}$-relation, its output must consist of data values in $\mathbb{D}$. Hence, the query result must choose some concrete value in the data domain independent of the annotation domain.
 
     Now let $h: \mathbb{N}[a,b] \to \mathbb{N}$ be the homomorphism defined by $h(a)=1$ and $h(b)=0$.
 
@@ -1085,20 +1103,20 @@ Before introducing this construction in detail, however, we first demonstrate th
 
 To address these limitations, we shift to a framework where data values and annotations are no longer treated as separate entities. By embedding the value domain into a semimodule over the annotation semiring, we can represent results as symbolic expressions such as $o_3 \otimes 20 + o_4 \otimes 20$.
 
-We notice that such expressions involve two types of mappings \cite{Glavic2021}:
+We notice that such expressions rely on two types of algebraic operations \cite{Glavic2021}:
 \begin{itemize}
-    \item Aggregation: a binary operation used to combine data values, corresponding to the specific aggregation function being computed (e.g., addition for SUM).
-    \item Pairing: a binary map that couples a semiring annotation with a data value to produce an element of the enriched domain.
+    \item Aggregation: an operation used to combine data values (e.g. addition).
+    \item Pairing: a map that scales a data value by a semiring annotation.
 \end{itemize}
 
-We assume that the aggregation values form a commutative monoid. For instance,
+More formally, we assume that the aggregation values form a commutative monoid. For instance,
 \[
     \texttt{SUM} = (\mathbb{R}, +, 0), \qquad
     \texttt{MIN} = (\mathbb{R} \cup \{\infty\}, \min, \infty), \qquad
     \texttt{MAX} = (\mathbb{R} \cup \{-\infty\}, \max, -\infty).
 \]
 
-We then require the pairing map $\ast : S \times M \to M$, for a commutative monoid $M$ and a commutative semiring $S$, to satisfy certain algebraic axioms. Conveniently, these are the axioms of a semimodule.
+We also require the pairing map $\ast : S \times M \to M$, for a commutative monoid $M$ and a commutative semiring $S$, to satisfy certain algebraic axioms. Conveniently, these are the axioms of a semimodule.
 
 \begin{defn}[Semimodule]
     Let $S$ be a commutative semiring. An \emph{$S$-semimodule} $(M, +_M, 0_M, \ast)$ is a commutative monoid $(M, +_M, 0_M)$ equipped with a map $\ast : S \times M \to M$, called scalar multiplication, such that for all $r, s \in S$ and $m, n \in M$:
@@ -1119,32 +1137,31 @@ We then require the pairing map $\ast : S \times M \to M$, for a commutative mon
 
 These axioms ensure that aggregation interacts coherently with both the semiring structure of the annotations and the monoid structure of the aggregation domain. In particular, they generalise the behaviour of multiplication under bag semantics.
 
-We now record two useful facts about semimodules.
+We say that a commutative monoid $(M, +_M, 0_M)$ can be \emph{extended} to an $S$-semimodule if there exists a map $\ast : S \times M \to M$ such that $(M, +_M, 0_M, \ast)$ satisfies the semimodule axioms. We now record two useful facts about semimodules.
 
 \begin{prop}
     \label{prop:allcommutativemonoidsNsemimodules}
     Every commutative monoid can be extended to an $\mathbb{N}$-semimodule.
 \end{prop}
 \begin{proof}
-    Let $(M, +_M, 0_M)$ be a commutative monoid. For any $n \in \mathbb{N}$ and $m \in M$, we define $n \ast m$ as the $n$-fold sum of $m$:
+    Let $(M, +_M, 0_M)$ be a commutative monoid. For any $n \in \mathbb{N}$ and $m \in M$, we define the scalar multiplication $\ast : \mathbb{N} \times M \to M$ as the $n$-fold sum of $m$:
     \begin{align*}
         0 \ast m       & = 0_M              \\
         (n + 1) \ast m & = (n \ast m) +_M m
     \end{align*}
-    By induction on $n$, it is straightforward to verify that the definition satisfies the semimodule axioms.
-
+    By induction on $n$, it is straightforward to verify that this definition of $\ast$ satisfies the semimodule axioms.
 \end{proof}
 
 \begin{prop}
     \label{prop:Bsemimoduleiffidempotentmonoid}
-    A commutative monoid $M$ can be extended to a $\mathbb{B}$-semimodule if and only if it is idempotent.
+    A commutative monoid $M$ can be extended to a $\mathbb{B}$-semimodule if and only if $M$ is idempotent.
 \end{prop}
 \begin{proof}
     \textbf{($\Rightarrow$)}
-    Suppose $M$ is a $\mathbb{B}$-semimodule. By the semimodule axioms, the identity $(s + s) \ast m = s \ast m + s \ast m$ must hold for any $s \in \mathbb{B}$. In the Boolean semiring, $1 + 1 = 1$. Substituting $s = 1$ into the axiom yields $1 \ast m = 1 \ast m + 1 \ast m$. Since $1 \ast m = m$ by the identity law, this simplifies to $m = m + m$, showing that $M$ is idempotent.
+    Suppose $(M, +_M, 0_M, \ast)$ is a $\mathbb{B}$-semimodule. By the semimodule axioms, the identity $(s + s) \ast m = (s \ast m) +_M (s \ast m)$ must hold for any $s \in \mathbb{B}$. In the Boolean semiring, $1 + 1 = 1$. Substituting $s = 1$ into the axiom yields $1 \ast m = (1 \ast m) +_M (1 \ast m)$. Since $1 \ast m = m$ by the identity law, this simplifies to $m = m +_M m$, showing that $M$ is idempotent.
 
     \textbf{($\Leftarrow$)}
-    Suppose $M$ is an idempotent commutative monoid. We define scalar multiplication $\ast : \mathbb{B} \times M \to M$ by $1 \ast m = m$ and $0 \ast m = 0_M$. The semimodule axioms follow immediately from the properties of the Boolean semiring together with idempotence of the monoid operation.
+    Suppose $M$ is an idempotent commutative monoid. We define the scalar multiplication map $\ast : \mathbb{B} \times M \to M$ by $1 \ast m = m$ and $0 \ast m = 0_M$. The semimodule axioms follow immediately from the properties of the Boolean semiring together with the idempotence of the monoid operation.
 \end{proof}
 
 Since, by \autoref{prop:allcommutativemonoidsNsemimodules}, every commutative monoid can be extended to an $\mathbb{N}$-semimodule, the framework recovers the usual bag semantics for aggregation: in particular, it supports standard operations such as $\texttt{SUM}$, $\texttt{MIN}$, and $\texttt{MAX}$ over bags. Moreover, since $\texttt{MIN}$ and $\texttt{MAX}$ form idempotent commutative monoids, using \autoref{prop:Bsemimoduleiffidempotentmonoid}, they can be extended to $\mathbb{B}$-semimodules and therefore yield the standard set semantics of $\texttt{MIN}$ and $\texttt{MAX}$ over sets.
@@ -1188,7 +1205,7 @@ We now extend the $\mathcal{S}$-relational algebra to an $(\mathcal{M}, \mathcal
 
 This definition ensures that the aggregate result is a formal sum in $S \otimes M$ that preserves the provenance of each contributing tuple. This operation serves as the foundation for the more general grouping operation, which partitions a relation before applying aggregation to each group.
 
-To formalise the grouping operation however, we first need to introduce an operation that acts as an indicator for the existence of a group. When a group contains at least one tuple from the support, the annotation should be 1, otherwise it should be 0.
+To define the grouping operation, we must determine the annotation of each output group. Under bag semantics, a group exists in the query output if and only if there is at least one contributing input tuple. The annotation of a group is computed by summing the annotations of its matching tuples. If this sum is nonzero (meaning the group contains at least one tuple from its support), the output annotation should collapse to $1$, and be $0$ otherwise. We thus introduce a unary operation on the semiring that acts as an indicator of this existence.
 
 \begin{defn}[$\delta$-semiring]
     A \emph{$\delta$-semiring} is a commutative semiring $(S, +_S, \cdot_S, 0_S, 1_S)$ equipped with a unary operation $\delta_S : S \to S$ satisfying the following laws:
@@ -1200,6 +1217,8 @@ To formalise the grouping operation however, we first need to introduce an opera
     \]
     If $S$ and $S'$ are $\delta$-semirings, a homomorphism between them is a semiring homomorphism $h: S \to S'$ such that $h(\delta_S(s)) = \delta_{S'}(h(s))$.
 \end{defn}
+
+These laws were chosen because they represent the minimal conditions for compatibility with both set and bag semantics, and for the fundamental theorem to continue to hold.
 
 We can now give the definition of the grouping operation.
 
@@ -1246,19 +1265,19 @@ We now turn to the fundamental theorem for the extended algebra, followed by two
     \[
         v = o_1 \otimes 30 + o_2 \otimes 40 + o_3 \otimes 20 + o_4 \otimes 20
     \]
-    The commutation with homomorphisms allows us to specialise this result for any specific semiring mapping. For instance, if $M = \text{SUM}$ and we apply a homomorphism $h$ where $o_1 = 1$, $o_2 = 0$ (representing a deletion), and $o_3 = o_4 = 1$, the expression evaluates as follows:
+    The commutation with homomorphisms allows us to specialise this result for any specific semiring mapping. For instance, if $M = \texttt{SUM}$ and we apply a homomorphism $h$ where $o_1 = 1$, $o_2 = 0$, and $o_3 = o_4 = 1$, the expression evaluates as follows:
     \begin{align*}
         h^M(v) & = 1 \otimes 30 + 0 \otimes 40 + 1 \otimes 20 + 1 \otimes 20 \\
                & = 1 \otimes 30 + 1 \otimes (20 + 20)                        \\
                & = 1 \otimes 70                                              \\
                & = 70
     \end{align*}
-    By contrast, if we apply the same mapping but let $M = \text{MAX}$, the result simplifies to $1 \otimes \max(30, 20, 20) = 30$.
+    By contrast, if we apply the same mapping but let $M = \texttt{MAX}$, the result simplifies to $1 \otimes \max(30, 20, 20) = 30$.
 \end{exmpl}
 
 \begin{exmpl}
     \label{ordersgrouping}
-    We now consider a grouping query $GB_{\{cust\_id\}, \{price\}}$ on the \textit{Orders} relation, using $M = \text{SUM}$. This operation partitions the relation by cust\_id and aggregates their respective spending. The resulting $(\mathcal{M}, \mathcal{S})$-relation is shown below:
+    We now consider a grouping query $GB_{\{cust\_id\}, \{price\}}$ on the \textit{Orders} relation, using $M = \texttt{SUM}$. This operation partitions the relation by cust\_id and aggregates their respective spending. The resulting $(\mathcal{M}, \mathcal{S})$-relation is shown below:
     \begin{center}
         \begin{tabular}{|c|c|c}
             \cline{1-2}
@@ -1275,7 +1294,7 @@ We now turn to the fundamental theorem for the extended algebra, followed by two
 Although the tensor product construction facilitates the integration of annotations and data values, its utility depends on the faithfulness of the mapping $\iota : M \to S \otimes M$. While this mapping is injective for both set semantics (min/max) and bag semantics (sum), in many other cases it is not, meaning that distinct elements of the original monoid may become indistinguishable within the tensor domain.
 
 \begin{exmpl}
-    The mapping $\iota : \text{SUM} \to \mathbb{B} \otimes \text{SUM}$ is not injective: $\iota(4) = \iota(2+2) = \iota(2) + \iota(2) = (1_{\mathbb{B}} \otimes 2) + (1_{\mathbb{B}} \otimes 2) = (1_{\mathbb{B}} \lor 1_{\mathbb{B}}) \otimes 2 = 1_{\mathbb{B}} \otimes 2 = \iota(2)$
+    The mapping $\iota : \texttt{SUM} \to \mathbb{B} \otimes \texttt{SUM}$ is not injective: $\iota(4) = \iota(2+2) = \iota(2) + \iota(2) = (1_{\mathbb{B}} \otimes 2) + (1_{\mathbb{B}} \otimes 2) = (1_{\mathbb{B}} \lor 1_{\mathbb{B}}) \otimes 2 = 1_{\mathbb{B}} \otimes 2 = \iota(2)$
 \end{exmpl}
 
 We now formalise this requirement and present two theorems establishing the conditions under which this property holds.
@@ -1316,7 +1335,7 @@ For non-idempotent monoids like $\texttt{SUM}$, compatibility is more restrictiv
     As $h \circ \iota$ is the identity, $\iota$ is injective for any commutative monoid $M$.
 \end{proof}
 
-As we have seen, idempotent semirings are suitable for operations like MIN and MAX, but they are inherently incompatible with non-idempotent aggregations such as SUM. To accommodate such aggregates, we can construct a bag-extended semiring that preserves the multiplicative structure of $S$ while allowing the additive structure to track multiplicities through the use of polynomials.
+As we have seen, idempotent semirings are suitable for operations like $\texttt{MIN}$ and $\texttt{MAX}$, but they are inherently incompatible with non-idempotent aggregations such as $\texttt{SUM}$. To accommodate such aggregates, we can construct a bag-extended semiring that preserves the multiplicative structure of $S$ while allowing the additive structure to track multiplicities through the use of polynomials.
 
 We begin with the semiring of polynomials $\mathbb{N}[S]$, where the variables are elements of $S$ and the coefficients are natural numbers. While $\mathbb{N}[S]$ is compatible with all commutative monoids, it does not always respect the multiplicative structure and identity elements of the original semiring $S$. We define $S{\mathbb{N}}$ as the quotient of $\mathbb{N}[S]$ by the smallest congruence relation $\sim$ that satisfies the following identities for all $n \in \mathbb{N}$ and $s, s' \in S$:
 \[
@@ -1330,9 +1349,9 @@ We begin with the semiring of polynomials $\mathbb{N}[S]$, where the variables a
 The existence of a homomorphism $f : S{\mathbb{N}} \to \mathbb{N}$ ensures that $S{\mathbb{N}}$ satisfies the condition for universal compatibility established in \autoref{thm:ifhomomorphismsthencompatible}.
 
 \begin{exmpl}
-    To illustrate this construction, consider an idempotent semiring $S$ and the monoid $M = \text{SUM}$. Suppose a query identifies the value $10$ through two distinct paths, annotated with $a$ and $b$. In the standard tensor domain $S \otimes \text{SUM}$, these combine as $(a +_S b) \otimes 10$. If both paths are present ($a = b = 1_S$), the idempotency of $S$ causes the result to collapse: $(1_S +_S 1_S) \otimes 10 = 1_S \otimes 10$. We therefore lose the information that the value $10$ occurred twice, leading to an incorrect sum of $10$ instead of $20$.
+    To illustrate this construction, consider an idempotent semiring $S$ and the monoid $M = \texttt{SUM}$. Suppose a query identifies the value $10$ through two distinct paths, annotated with $a$ and $b$. In the standard tensor domain $S \otimes \texttt{SUM}$, these combine as $(a +_S b) \otimes 10$. If both paths are present ($a = b = 1_S$), the idempotency of $S$ causes the result to collapse: $(1_S +_S 1_S) \otimes 10 = 1_S \otimes 10$. We therefore lose the information that the value $10$ occurred twice, leading to an incorrect sum of $10$ instead of $20$.
 
-    In the bag-extended domain $S\mathbb{N} \otimes \text{SUM}$, the same result is represented as $(1 \cdot a + 1 \cdot b) \otimes 10$. By specialising this result via a homomorphism $f: S\mathbb{N} \to \mathbb{N}$ (mapping $a, b \mapsto 1$), the coefficient $1 \cdot a + 1 \cdot b$ evaluates to $2$. The result then correctly becomes $2 \otimes 10$, which yields the expected sum of $20$.
+    In the bag-extended domain $S\mathbb{N} \otimes \texttt{SUM}$, the same result is represented as $(1 \cdot a + 1 \cdot b) \otimes 10$. By specialising this result via a homomorphism $f: S\mathbb{N} \to \mathbb{N}$ (mapping $a, b \mapsto 1$), the coefficient $1 \cdot a + 1 \cdot b$ evaluates to $2$. The result then correctly becomes $2 \otimes 10$, which yields the expected sum of $20$.
 \end{exmpl}
 
 We have thus far considered aggregation in a limited context: when it is the last operation of the query. In the following section, we generalise this framework to account for arbitrarily complex queries, where aggregation and grouping may appear as intermediate steps.
@@ -1363,7 +1382,7 @@ More specifically, we introduce to the semiring $S$ new expressions of the form 
 We now formalise the treatment of complex aggregate queries by constructing an extended structure.
 
 \begin{defn}[$S^M$]
-    We define a semiring $\widehat{S} = \mathbb{N}[S \cup \{ [c_1 = c_2] \mid c_1, c_2 \in S \otimes M \}]$, which treats equality expressions as additional variables. We then define $S^M$ as the quotient of $\widehat{S}$ by a congruence relation $\sim$ satisfying the following identities for all $s_1,s_2 \in S$:
+    Let $S$ be a commutative semiring. We define a semiring $\widehat{S} = \mathbb{N}[S \cup \{ [c_1 = c_2] \mid c_1, c_2 \in S \otimes M \}]$, which treats equality expressions as additional variables. We then define $S^M$ as the quotient of $\widehat{S}$ by a congruence relation $\sim$ satisfying the following identities for all $s_1,s_2 \in S$:
     \[
         \begin{aligned}
             0_{\widehat{S}}             & \sim 0_S             \\
@@ -1620,7 +1639,7 @@ In general, the existence of a monus is not guaranteed for all pairs in a natura
     \[
         a \ominus b =
         \begin{cases}
-            a - b & a \ge b,          \\
+            a - b & \text{if }a \ge b, \\
             0     & \text{otherwise.}
         \end{cases}
     \]
@@ -1629,7 +1648,7 @@ In general, the existence of a monus is not guaranteed for all pairs in a natura
     Lastly, we can define monus in the tropical semiring as:
     \[
         a \ominus b = \begin{cases}
-            \infty & a \ge b           \\
+            \infty & \text{if }a \ge b \\
             a      & \text{otherwise.}
         \end{cases}
     \]
@@ -1832,16 +1851,18 @@ As noted above, a valuation of $\pi [\![ \varphi ]\!] = 0$ indicates that $\varp
     An $\mathcal{S}$-interpretation $\pi : \mathrm{Lit}_{A}(\tau) \to S$ is \emph{model-defining} if, for each atom $R(\vec{a})$, exactly one of the values $\pi (R(\vec{a}))$ and $\pi (\lnot R(\vec{a}))$ is 0. Consequently, every model-defining interpretation $\pi$ uniquely determines a model $\mathfrak{A}_\pi$ such that for any literal $L$ we have $\mathfrak{A}_\pi \vDash L$ if and only if $\pi(L) \neq 0$.
 \end{defn}
 
+While a model-defining interpretation allows us to extract a model $\mathfrak{A}_\pi$ from an $\mathcal{S}$-interpretation, we can also perform the converse construction. Given any model $\mathfrak{A}$, we can define an interpretation that recovers standard model-theoretic truth.
+
 \begin{exmpl}
-    For any finite structure $\mathfrak{A}$, the \emph{canonical truth interpretation} is the mapping $\pi_{\mathfrak{A}} : \text{Lit}_A(\tau) \to \mathbb{B}$, where $\mathbb{B}$ is the Boolean semiring. This interpretation is defined as follows:
+    Let $\mathfrak{A}$ be a model over the relational vocabulary $\tau$ with universe $A$. The \emph{canonical truth interpretation} is the model-defining interpretation $\pi_{\mathfrak{A}} : \text{Lit}_A(\tau) \to \mathbb{B}$ defined by:
     \[
         \pi_{\mathfrak{A}}(L) =
         \begin{cases}
-            1 & \mathfrak{A} \models L \\
+            1 & \text{if } \mathfrak{A} \models L \\
             0 & \text{otherwise.}
         \end{cases}
     \]
-    Under this interpretation, the resulting valuation $\pi_{\mathfrak{A}} [\![ \varphi ]\!] = 1$ if and only if $\mathfrak{A} \models \varphi$ in the standard model-theoretic sense.
+    Under this interpretation, $\pi_{\mathfrak{A}} [\![ \varphi ]\!] = 1$ if and only if $\mathfrak{A} \models \varphi$.
 \end{exmpl}
 
 To justify the choice of semirings as the semantic domain, Grädel and Tannen provide a proof-theoretic semantics. The valuation of a formula in a semiring is then shown to be exactly the sum of the valuations of its proof trees.
@@ -1900,6 +1921,7 @@ We now consider interpretations into the semiring of dual-indeterminate polynomi
 To track provenance for a given model we use an interpretation that is both model-defining and provenance-tracking. The idea is that if the interpretation annotates a positive or negative atom with a token, then we wish to track that atom. On the other hand annotating with 0 or 1 is done when we do not track the atom, yet we need to recall whether it holds in the model.
 
 \begin{exmpl}
+    \label{socialnetwork}
     Consider a social network with universe $A = \{a, b, c\}$ (Alice, Bob, Charlie). We use $F(x, y)$ to denote a relation where $x$ follows $y$. Suppose we are interested in the sentence $\varphi$ which asserts that there is a user whom both Alice and Bob follow, but who does not follow Alice back:
     \[
         \varphi := \exists z (F(a, z) \land F(b, z) \land \lnot F(z, a))
@@ -1954,7 +1976,7 @@ To make this relationship precise, we define what it means for a specific struct
 Evaluating a query under a model-compatible interpretation produces a polynomial that serves as a catalogue of the conditions required for truth across the entire family of compatible structures. By selecting a particular monomial, we can identify a concrete model from the family that yields the desired outcome, enabling us to work backwards from a query result to the specific database that produces it. We end the chapter by applying reverse provenance analysis to our social network example.
 
 \begin{exmpl}
-    Suppose we are interested in the sentence $\psi$ which states that no one is followed by everyone:
+    Continuing \autoref{socialnetwork}, suppose we are interested in the sentence $\psi$ which states that no one is followed by everyone:
     \[
         \psi :=  \forall y \exists x \lnot F(x, y)
     \]
@@ -1978,7 +2000,7 @@ Evaluating a query under a model-compatible interpretation produces a polynomial
 
 \end{exmpl}
 
-While elegant and comprehensive, a critique of this approach is that the transformation to negation normal form is a syntactic restriction that flattens nested structure \cite{Badia2025}.
+While elegant and comprehensive, a critique of this approach is that the transformation to negation normal form is a syntactic restriction that flattens nested structure \cite{Badia2025}. This restriction means that provenance evaluation is not compositional with respect to negation: the provenance of a negated formula, such as $\pi[\![ \neg (\psi \land \chi) ]\!]$, cannot be computed directly from $\pi[\![ \psi \land \chi ]\!]$. Instead, the entire formula must be syntactically rewritten prior to evaluation, which destroys the nested structure of the original query and prevents us from computing provenance as the query is evaluated.
 
 \chapter{Conclusion}
 \label{chapter:conclusion}
@@ -1991,9 +2013,11 @@ Additionally, the work of Suciu \cite{Suciu2024} regarding semiring ideals was c
 
 Notwithstanding recent progress, several important challenges remain within the field. Central to these is the development of a unified framework capable of expressing aggregate, recursive, and negative queries. While such a synthesis has yet to be fully realised, recent contributions offer promising directions. \cite{Sen2025} presents ProvSQL, a PostgreSQL extension that tracks provenance for the relational algebra and aggregation, while \cite{AboKhamis2024} introduces an extension of Datalog to $S$-relations that encompasses both recursion and aggregation.
 
-A persistent challenge lies in the trade-off between the generality of a provenance representation and its practical computational feasibility. This is best illustrated by the role of the provenance semiring $\mathbb{N}[X]$. As the free commutative semiring, $\mathbb{N}[X]$ provides the most general representation. This universality is theoretically indispensable, as it allows a single symbolic calculation to serve a broad spectrum of applications. However, this high degree of generality comes at a substantial practical cost. The storage requirements for these polynomials, and the computational overhead required to manipulate them, impose significant performance constraints on large data environments. Therefore, a key objective of research is to identify a balance between the generality and practicality of different provenance representations \cite{Glavic2021}.
+A persistent challenge lies in the trade-off between the generality of a provenance representation and its practical computational feasibility. This is best illustrated by the role of the provenance semiring $\mathbb{N}[X]$. As the free commutative semiring, $\mathbb{N}[X]$ provides the most general representation. This universality is theoretically indispensable, as it allows a single symbolic calculation to serve a broad spectrum of applications.
 
-In a similar vein, we claim that commutative semirings are not sufficiently general. While their axioms ensure compatibility with the relational algebra, the properties of commutativity and associativity result in a significant loss of structural provenance information. Commutativity obscures the sequence of operations, while associativity nullifies the hierarchical nesting of the query (as evidenced by \autoref{query:3edges} on the \textit{Edges} relation in \autoref{fig:edges}). To realise a richer provenance framework, research must look to algebraic structures capable of documenting the full history of a data transformation.
+However, this high degree of generality comes at a substantial practical cost. The storage requirements for these polynomials, and the computational overhead required to manipulate them, incur at least a polynomial cost in both time and space, thereby imposing significant performance constraints on large data environments. Therefore, a key objective of research is to identify a balance between the generality and practicality of different provenance representations \cite{Glavic2021}.
+
+In a similar vein, we claim that commutative semirings are not sufficiently general. While their axioms ensure compatibility with the relational algebra, the properties of commutativity and associativity result in a significant loss of structural provenance information as they obscure the sequence of operations (as evidenced by \autoref{query:3edges} on the \textit{Edges} relation in \autoref{fig:edges}). To realise a richer provenance framework, research must look to algebraic structures capable of documenting the full history of a data transformation.
 
 \printbibliography
 
